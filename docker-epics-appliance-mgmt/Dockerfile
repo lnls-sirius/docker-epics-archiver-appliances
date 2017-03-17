@@ -1,7 +1,15 @@
 
-FROM tomcat:9-alpine
+FROM gciotto/epics-archiver-generic
 
 MAINTAINER Gustavo Ciotto
+
+USER root
+
+ARG ARCHAPPL_MYIDENTITY=lnls_control_appliance_1
+ARG APPLIANCE_UNIT=mgmt
+
+ENV ARCHAPPL_MYIDENTITY ${ARCHAPPL_MYIDENTITY}
+ENV APPLIANCE_UNIT=${APPLIANCE_UNIT}
 
 # user root is required to install all needed packages
 USER root
@@ -10,12 +18,23 @@ ENV APPLIANCE_NAME epics-archiver-appliances
 
 ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
 
-RUN mkdir -p ${APPLIANCE_FOLDER}/build/scripts
+# APPLIANCE_UNIT should be defined on building throught --build-arg
+# ENV APPLIANCE_UNIT mgmt
 
-COPY docker-alpine-update.sh \
-     env-vars.sh \
+RUN apt-get install -y xmlstarlet
+
+RUN mkdir -p ${APPLIANCE_FOLDER}/${APPLIANCE_UNIT}
+
+COPY setup-appliance-specific.sh \
      ${APPLIANCE_FOLDER}/build/scripts/
 
-RUN ${APPLIANCE_FOLDER}/build/scripts/docker-alpine-update.sh
+COPY context.xml \
+     ${CATALINA_HOME}/conf/context.xml
+
+RUN ${APPLIANCE_FOLDER}/build/scripts/setup-appliance-specific.sh
+
+CMD ["${CATALINA_HOME}/bin/catalina.sh", "start"]
+
+
 
 
