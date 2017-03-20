@@ -8,6 +8,8 @@ set -u
 
 RAND_SRV_PORT=16000
 
+echo xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES}
+
 APPLIANCE_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//" ) 
 
 echo ${APPLIANCE_PORT}
@@ -31,3 +33,7 @@ ls ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}
 sed -i 's/username=.*$/username=\"'"${MYSQL_USER}"'\"/' ${CATALINA_HOME}/conf/context.xml
 sed -i 's/password=.*$/password=\"'"${MYSQL_PASSWORD}"'\"/' ${CATALINA_HOME}/conf/context.xml
 sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${HOST_ADDRESS}"':'"${MYSQL_PORT}"'\/'"${MYSQL_DATABASE}"'\"/' ${CATALINA_HOME}/conf/context.xml
+
+if [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
+        git clone https://github.com/gciotto/archiver-viewer.git ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}/ui/archiver-viewer
+fi

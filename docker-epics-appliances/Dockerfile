@@ -26,6 +26,7 @@ RUN apt-get install -y xmlstarlet
 RUN mkdir -p ${APPLIANCE_FOLDER}/${APPLIANCE_UNIT}
 
 COPY setup-appliance-specific.sh \
+     docker-tomcat-init.sh \
      ${APPLIANCE_FOLDER}/build/scripts/
 
 COPY context.xml \
@@ -33,8 +34,6 @@ COPY context.xml \
 
 RUN ${APPLIANCE_FOLDER}/build/scripts/setup-appliance-specific.sh
 
-CMD ["${CATALINA_HOME}/bin/catalina.sh", "start"]
-
-
+CMD ["/opt/epics-archiver-appliances/build/scripts/docker-tomcat-init.sh"]
 
 
