@@ -1,11 +1,5 @@
 #!/bin/bash
 
-EPICS_BASE_VERSION=3.14.12.6
-EPICS_BASE_TAR_NAME=baseR${EPICS_BASE_VERSION}
-EPICS_BASE_NAME=base-${EPICS_BASE_VERSION}
-EPICS_BASE_URL=https://www.aps.anl.gov/epics/download/base/${EPICS_BASE_TAR_NAME}.tar.gz
-EPICS_INSTALL_DIR=/opt
-
 DOCKER_MANTAINER_NAME=gciotto
 DOCKER_NAME=epics-archiver-generic
 DOCKER_RUN_NAME=epics-archiver-generic
@@ -20,3 +14,5 @@ MYSQL_DATABASE=lnls_archiver_db
 MYSQL_PORT=3306
 
 HOST_ADDRESS=10.0.6.49
+
+NETWORK_ID=epics-archiver-network
