@@ -7,6 +7,7 @@ set -u
 . ${APPLIANCE_FOLDER}/build/scripts/env-vars.sh
 
 RAND_SRV_PORT=16000
+HOST_ADDRESS=172.18.0.2
 
 echo xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES}
 
