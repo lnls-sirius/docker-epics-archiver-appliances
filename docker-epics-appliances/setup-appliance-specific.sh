@@ -7,7 +7,7 @@ set -u
 . ${APPLIANCE_FOLDER}/build/scripts/env-vars.sh
 
 RAND_SRV_PORT=16000
-HOST_ADDRESS=172.18.0.2
+MYSQL_SQL_ADDRESS=10.128.1.6
 
 echo xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES}
 
@@ -33,7 +33,7 @@ ls ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}
 
 sed -i 's/username=.*$/username=\"'"${MYSQL_USER}"'\"/' ${CATALINA_HOME}/conf/context.xml
 sed -i 's/password=.*$/password=\"'"${MYSQL_PASSWORD}"'\"/' ${CATALINA_HOME}/conf/context.xml
-sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${HOST_ADDRESS}"':'"${MYSQL_PORT}"'\/'"${MYSQL_DATABASE}"'\"/' ${CATALINA_HOME}/conf/context.xml
+sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${MYSQL_SQL_ADDRESS}"':'"${MYSQL_PORT}"'\/'"${MYSQL_DATABASE}"'\"/' ${CATALINA_HOME}/conf/context.xml
 
 if [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
         git clone https://github.com/gciotto/archiver-viewer.git ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}/ui/archiver-viewer
