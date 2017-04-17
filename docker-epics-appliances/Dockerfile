@@ -21,8 +21,6 @@ ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
 # APPLIANCE_UNIT should be defined on building throught --build-arg
 # ENV APPLIANCE_UNIT mgmt
 
-RUN apt-get install -y xmlstarlet
-
 RUN mkdir -p ${APPLIANCE_FOLDER}/${APPLIANCE_UNIT}
 
 COPY setup-appliance-specific.sh \
