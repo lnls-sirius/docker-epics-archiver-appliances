@@ -24,6 +24,10 @@ xmlstarlet ed -L -d "/Server/Service/Connector[@protocol!='HTTP/1.1']" ${CATALIN
 # (ii) Copy appliance into tomcat's webapps/
 mkdir ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}
 
+# Build only specific war file
+export TOMCAT_HOME=${CATALINA_HOME}
+(cd ${GITHUB_REPOSITORY_FOLDER}; ant ${APPLIANCE_UNIT}_war)
+
 cp ${GITHUB_REPOSITORY_FOLDER}/${APPLIANCE_UNIT}.war ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}
 (cd ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}; jar xf ${APPLIANCE_UNIT}.war)
 
