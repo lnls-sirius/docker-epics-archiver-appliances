@@ -3,7 +3,7 @@ FROM tomcat:9
 
 MAINTAINER Gustavo Ciotto
 
-# user root is required to install all needed packages
+# User root is required to install all needed packages
 USER root
 
 ENV APPLIANCE_NAME epics-archiver-appliances
@@ -12,15 +12,15 @@ ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/build/scripts
 
-COPY docker-update.sh \
-     ${APPLIANCE_FOLDER}/build/scripts/
+# Updates default image and install required packages
+RUN apt-get -y update
+RUN apt-get install -y git wget tar ant libreadline-dev make perl gcc g++ openjdk-8-jdk xmlstarlet
 
-WORKDIR ${APPLIANCE_FOLDER}/build/scripts/
-
-RUN ./docker-update.sh
+# General EPICS Archiver Appliance Setup
 
 ENV ARCHAPPL_SITEID lnls-control-archiver
 
+# EPICS environment variables
 ENV EPICS_BASE_VERSION 3.14.12.6
 ENV EPICS_BASE_TAR_NAME baseR${EPICS_BASE_VERSION}
 ENV EPICS_BASE_NAME base-${EPICS_BASE_VERSION}
@@ -42,13 +42,14 @@ RUN ./docker-setup-epics.sh
 COPY docker-setup-appliances.sh \
 	 ${APPLIANCE_FOLDER}/build/scripts/
 
+# PUSH GITHUB REPOSITORY
 RUN ./docker-setup-appliances.sh
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/build/bin
 
-RUN wget -P ${APPLIANCE_FOLDER}/build/bin https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.41.tar.gz
-
 ENV MYSQL_CONNECTOR mysql-connector-java-5.1.41
+
+RUN wget -P ${APPLIANCE_FOLDER}/build/bin https://dev.mysql.com/get/Downloads/Connector-J/${MYSQL_CONNECTOR}.tar.gz
 
 RUN tar -C ${APPLIANCE_FOLDER}/build/bin -xvf ${APPLIANCE_FOLDER}/build/bin/${MYSQL_CONNECTOR}.tar.gz
 
@@ -75,5 +76,3 @@ ENV ARCHAPPL_LONG_TERM_FOLDER ${APPLIANCE_FOLDER}/storage/lts
 RUN mkdir -p ${ARCHAPPL_SHORT_TERM_FOLDER}
 RUN mkdir -p ${ARCHAPPL_MEDIUM_TERM_FOLDER}
 RUN mkdir -p ${ARCHAPPL_LONG_TERM_FOLDER}
-
-
