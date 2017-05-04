@@ -1,10 +1,11 @@
 #!/bin/sh
 
-set -a
-set -e
-set -u
-
-. ./env-vars.sh
+#
+# A script to download and compile EPICS base.
+#
+# Gustavo Ciotto Pinton
+# Controls Group - Brazilian Synchrotron Light Source Laboratory - LNLS
+#
 
 # Setting EPICS base up
 
