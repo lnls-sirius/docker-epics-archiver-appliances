@@ -1,3 +1,12 @@
+#
+# Docker image for mgmt, retrieval, etl and engine servlets. It receives two
+# arguments: the first is the name of the appliance this image will belong to and
+# the second is the name of the appliance (mgmt, retrieval, etl or engine).
+# 
+# Gustavo Ciotto Pinton
+# LNLS - Brazilian Synchrotron Light Source
+# Controls Group
+#
 
 FROM gciotto/epics-archiver-generic
 
@@ -9,7 +18,7 @@ ARG ARCHAPPL_MYIDENTITY=lnls_control_appliance_1
 ARG APPLIANCE_UNIT=mgmt
 
 ENV ARCHAPPL_MYIDENTITY ${ARCHAPPL_MYIDENTITY}
-ENV APPLIANCE_UNIT=${APPLIANCE_UNIT}
+ENV APPLIANCE_UNIT ${APPLIANCE_UNIT}
 
 # user root is required to install all needed packages
 USER root
@@ -23,15 +32,14 @@ ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/${APPLIANCE_UNIT}
 
-COPY setup-appliance-specific.sh \
-     docker-tomcat-init.sh \
+COPY setup-appliance.sh \
+     tomcat-service.sh \
      ${APPLIANCE_FOLDER}/build/scripts/
 
-COPY context.xml \
+COPY configuration/context.xml \
      ${CATALINA_HOME}/conf/context.xml
 
-RUN ${APPLIANCE_FOLDER}/build/scripts/setup-appliance-specific.sh
+# Setup appliance according to its name, passed by the command docker build
+RUN ${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
 
-CMD ["/opt/epics-archiver-appliances/build/scripts/docker-tomcat-init.sh"]
-
-
+CMD ["sh", "-c", "${APPLIANCE_FOLDER}/build/scripts/tomcat-service.sh"]
