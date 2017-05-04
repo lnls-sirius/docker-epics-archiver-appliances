@@ -1,3 +1,11 @@
+#
+# Docker image for a general EPICS Archiver Appliance. It consists of 
+# the base image for the mgmt, etl, engine and retrieval Docker containers.
+# 
+# Gustavo Ciotto Pinton
+# LNLS - Brazilian Synchrotron Light Source
+# Controls Group
+#
 
 FROM tomcat:9
 
@@ -7,7 +15,6 @@ MAINTAINER Gustavo Ciotto
 USER root
 
 ENV APPLIANCE_NAME epics-archiver-appliances
-
 ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/build/scripts
@@ -17,7 +24,6 @@ RUN apt-get -y update
 RUN apt-get install -y git wget tar ant libreadline-dev make perl gcc g++ openjdk-8-jdk xmlstarlet
 
 # General EPICS Archiver Appliance Setup
-
 ENV ARCHAPPL_SITEID lnls-control-archiver
 
 # EPICS environment variables
@@ -33,20 +39,24 @@ ENV EPICS_CA_ADDR_LIST 10.0.4.69 10.0.6.49
 ENV EPICS_BASE ${EPICS_INSTALL_DIR}/${EPICS_BASE_NAME}
 ENV PATH ${EPICS_INSTALL_DIR}/${EPICS_BASE_NAME}/bin/${EPICS_HOST_ARCH}:$PATH
 
+# Github repository variables
+ENV GITHUB_APPLIANCES_BRANCH develop-php
+ENV GITHUB_REPOSITORY_FOLDER /opt/epicsarchiverap-ldap
+ENV GITHUB_REPOSITORY_URL https://github.com/lnls-sirius/epicsarchiverap-ldap.git
+
 COPY env-vars.sh \
-     docker-setup-epics.sh \
+     setup-epics.sh \
      ${APPLIANCE_FOLDER}/build/scripts/
 
-RUN ./docker-setup-epics.sh
+# Install EPICS base
+RUN ${APPLIANCE_FOLDER}/build/scripts/setup-epics.sh
 
-COPY docker-setup-appliances.sh \
-	 ${APPLIANCE_FOLDER}/build/scripts/
-
-# PUSH GITHUB REPOSITORY
-RUN ./docker-setup-appliances.sh
+# Clone archiver github's repository
+RUN git clone --branch=${GITHUB_APPLIANCES_BRANCH} ${GITHUB_REPOSITORY_URL} ${GITHUB_REPOSITORY_FOLDER}
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/build/bin
 
+### Set up mysql connector
 ENV MYSQL_CONNECTOR mysql-connector-java-5.1.41
 
 RUN wget -P ${APPLIANCE_FOLDER}/build/bin https://dev.mysql.com/get/Downloads/Connector-J/${MYSQL_CONNECTOR}.tar.gz
