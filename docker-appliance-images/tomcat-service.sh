@@ -1,5 +1,10 @@
 #!/bin/sh
 
+#
+# A simple script to start tomcat service. This script blocks and does not
+# allow the container to finish and end.
+#
+
 ${CATALINA_HOME}/bin/catalina.sh start
 
 
