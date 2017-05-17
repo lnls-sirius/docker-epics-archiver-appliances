@@ -24,6 +24,10 @@ xmlstarlet ed -L -d "/Server/Service/Connector[@protocol!='HTTP/1.1']" ${CATALIN
 # (ii) Copy appliance into tomcat's webapps/
 mkdir ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}
 
+# Change wardest and dist properties in build.xml to ./
+xmlstarlet ed -L -u "/project/property[@name='wardest']/@location" -v "./" ${GITHUB_REPOSITORY_FOLDER}/build.xml
+xmlstarlet ed -L -u "/project/property[@name='dist']/@location" -v "./" ${GITHUB_REPOSITORY_FOLDER}/build.xml
+
 # Build only specific war file
 export TOMCAT_HOME=${CATALINA_HOME}
 (cd ${GITHUB_REPOSITORY_FOLDER}; ant ${APPLIANCE_UNIT}_war)
@@ -41,4 +45,5 @@ sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${MYSQL_SQL_ADDRESS}"':'"${MYSQL_PORT}"
 
 if [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
         git clone https://github.com/gciotto/archiver-viewer.git ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}/ui/archiver-viewer
+        git clone https://github.com/slacmshankar/svg_viewer.git ${CATALINA_HOME}/webapps/${APPLIANCE_UNIT}/ui/viewer
 fi
