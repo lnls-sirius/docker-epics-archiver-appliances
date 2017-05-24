@@ -14,14 +14,15 @@ MAINTAINER Gustavo Ciotto
 # User root is required to install all needed packages
 USER root
 
-ENV APPLIANCE_NAME epics-archiver-appliances
-ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
-
-RUN mkdir -p ${APPLIANCE_FOLDER}/build/scripts
 
 # Updates default image and install required packages
 RUN apt-get -y update
 RUN apt-get install -y git wget tar ant libreadline-dev make perl gcc g++ openjdk-8-jdk xmlstarlet
+
+ENV APPLIANCE_NAME epics-archiver-appliances
+ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
+
+RUN mkdir -p ${APPLIANCE_FOLDER}/build/scripts
 
 # General EPICS Archiver Appliance Setup
 ENV ARCHAPPL_SITEID lnls-control-archiver
@@ -39,17 +40,17 @@ ENV EPICS_CA_ADDR_LIST 10.0.4.69 10.0.6.49
 ENV EPICS_BASE ${EPICS_INSTALL_DIR}/${EPICS_BASE_NAME}
 ENV PATH ${EPICS_INSTALL_DIR}/${EPICS_BASE_NAME}/bin/${EPICS_HOST_ARCH}:$PATH
 
-# Github repository variables
-ENV GITHUB_APPLIANCES_BRANCH develop-php
-ENV GITHUB_REPOSITORY_FOLDER /opt/epicsarchiverap-ldap
-ENV GITHUB_REPOSITORY_URL https://github.com/lnls-sirius/epicsarchiverap-ldap.git
-
 COPY env-vars.sh \
      setup-epics.sh \
      ${APPLIANCE_FOLDER}/build/scripts/
 
 # Install EPICS base
 RUN ${APPLIANCE_FOLDER}/build/scripts/setup-epics.sh
+
+# Github repository variables
+ENV GITHUB_APPLIANCES_BRANCH ldap-login
+ENV GITHUB_REPOSITORY_FOLDER /opt/epicsarchiverap-ldap
+ENV GITHUB_REPOSITORY_URL https://github.com/lnls-sirius/epicsarchiverap-ldap.git
 
 # Clone archiver github's repository
 RUN git clone --branch=${GITHUB_APPLIANCES_BRANCH} ${GITHUB_REPOSITORY_URL} ${GITHUB_REPOSITORY_FOLDER}
