@@ -6,6 +6,8 @@
 # LNLS - Brazilian Synchrotron Light Source
 # Controls Group
 #
+# TODO: Remove source files required to build the image. It are kept for now only for developmente purposes.
+#
 
 FROM tomcat:9
 
@@ -14,10 +16,10 @@ MAINTAINER Gustavo Ciotto
 # User root is required to install all needed packages
 USER root
 
-
 # Updates default image and install required packages
-RUN apt-get -y update
-RUN apt-get install -y git wget tar ant libreadline-dev make perl gcc g++ openjdk-8-jdk xmlstarlet
+RUN apt-get -y update && \
+ apt-get install -y ant gcc git g++ libreadline libreadline-dev make openjdk-8-jdk perl tar xmlstarlet wget && \
+ rm -rf /var/lib/apt/lists/*
 
 ENV APPLIANCE_NAME epics-archiver-appliances
 ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
