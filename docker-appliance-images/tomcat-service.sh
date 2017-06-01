@@ -5,6 +5,19 @@
 # allow the container to finish and end.
 #
 
+# Before starting Tomcat service, change cluster inet port of mgmt servlet.
+# This change in required only for Kubernetes
+
+if [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
+
+	# Get local ip address
+	IP_ADDRESS=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+
+	# Change cluster inet address
+	xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" -v ${IP_ADDRESS}:12000 ${ARCHAPPL_APPLIANCES}	
+
+fi
+
 ${CATALINA_HOME}/bin/catalina.sh start
 
 
