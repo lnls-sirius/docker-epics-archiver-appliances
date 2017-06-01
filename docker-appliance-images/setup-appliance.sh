@@ -97,7 +97,7 @@ if [ "${APPLIANCE_UNIT}" = "engine" ] || [ "${APPLIANCE_UNIT}" = "etl" ] ; then
 
         xmlstarlet ed -L -s '/Context' -t elem -n 'Valve' \
                          -i '/Context/Valve' -t attr -n 'className' -v 'org.apache.catalina.valves.RemoteAddrValve' \
-                         -i '/Context/Valve' -t attr -n 'allow' -v '10\.128\.\d+\.\d+' \
+                         -i '/Context/Valve' -t attr -n 'allow' -v '172\.17\.\d+\.\d+' \
                        ${CATALINA_HOME}/conf/context.xml
 fi
 
