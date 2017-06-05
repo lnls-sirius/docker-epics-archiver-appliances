@@ -18,7 +18,7 @@ USER root
 
 # Updates default image and install required packages
 RUN apt-get -y update && \
- apt-get install -y ant gcc git g++ libreadline libreadline-dev make openjdk-8-jdk perl tar xmlstarlet wget && \
+ apt-get install -y ant gcc git g++ libreadline-dev make openjdk-8-jdk perl tar xmlstarlet wget && \
  rm -rf /var/lib/apt/lists/*
 
 ENV APPLIANCE_NAME epics-archiver-appliances
