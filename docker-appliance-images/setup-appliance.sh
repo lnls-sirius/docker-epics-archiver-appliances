@@ -9,11 +9,9 @@ set -u
 RAND_SRV_PORT=16000
 MYSQL_SQL_ADDRESS=10.128.1.6
 
-echo xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES}
+RETRIEVAL_DEFAULT_PORT=31998
 
 APPLIANCE_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//" ) 
-
-echo ${APPLIANCE_PORT}
 
 ### Tomcat configuration
 # (i) Change tomcat's conf/ files
@@ -65,6 +63,11 @@ elif [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
                          -i '/Server/Service/Engine/Host/Realm' -t attr -n "className" -v "org.apache.catalina.realm.JNDIRealm" \
                          ${CATALINA_HOME}/conf/server.xml
 
+
+	# Changes viewer's url port
+	RETRIEVAL_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/retrieval_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//" ) 
+	sed -i "s:${RETRIEVAL_DEFAULT_PORT}/retrieval:${RETRIEVAL_PORT}/retrieval:" ${GITHUB_REPOSITORY_FOLDER}/src/main/org/epics/archiverappliance/mgmt/staticcontent/js/mgmt.js
+
 fi
 
 # Imports certificate into trusted keystore
@@ -95,10 +98,12 @@ sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${MYSQL_SQL_ADDRESS}"':'"${MYSQL_PORT}"
 # Do not allow external accesses in engine and etl appliances
 if [ "${APPLIANCE_UNIT}" = "engine" ] || [ "${APPLIANCE_UNIT}" = "etl" ] ; then
 
-        xmlstarlet ed -L -s '/Context' -t elem -n 'Valve' \
-                         -i '/Context/Valve' -t attr -n 'className' -v 'org.apache.catalina.valves.RemoteAddrValve' \
-                         -i '/Context/Valve' -t attr -n 'allow' -v '172\.17\.\d+\.\d+' \
-                       ${CATALINA_HOME}/conf/context.xml
+	echo "Applying access restriction from external networks..."
+	# Find a way to change allowed addresses with the internal network address
+	# xmlstarlet ed -L -s '/Context' -t elem -n 'Valve' \
+	#		  -i '/Context/Valve' -t attr -n 'className' -v 'org.apache.catalina.valves.RemoteAddrValve' \
+	#                 -i '/Context/Valve' -t attr -n 'allow' -v '172\.17\.\d+\.\d+' \
+	#                 ${CATALINA_HOME}/conf/context.xml
 fi
 
 if [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
