@@ -90,3 +90,8 @@ ENV ARCHAPPL_LONG_TERM_FOLDER ${APPLIANCE_FOLDER}/storage/lts
 RUN mkdir -p ${ARCHAPPL_SHORT_TERM_FOLDER}
 RUN mkdir -p ${ARCHAPPL_MEDIUM_TERM_FOLDER}
 RUN mkdir -p ${ARCHAPPL_LONG_TERM_FOLDER}
+
+RUN mkdir -p ${APPLIANCE_FOLDER}/build/configuration/wait-for-it
+RUN git clone https://github.com/vishnubob/wait-for-it.git ${APPLIANCE_FOLDER}/build/configuration/wait-for-it
+
+
