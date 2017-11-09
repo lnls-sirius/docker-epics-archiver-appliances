@@ -16,6 +16,9 @@ if [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
 	# Change cluster inet address
 	xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" -v ${IP_ADDRESS}:12000 ${ARCHAPPL_APPLIANCES}	
 
+	# Waits for MySQL database to start
+	chmod +x ${APPLIANCE_FOLDER}/build/configuration/wait-for-it/wait-for-it.sh
+	${APPLIANCE_FOLDER}/build/configuration/wait-for-it/wait-for-it.sh epics-archiver-mysql-db:3306
 fi
 
 ${CATALINA_HOME}/bin/catalina.sh start

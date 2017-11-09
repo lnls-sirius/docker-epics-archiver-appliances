@@ -7,7 +7,7 @@ set -u
 . ${APPLIANCE_FOLDER}/build/scripts/env-vars.sh
 
 RAND_SRV_PORT=16000
-MYSQL_SQL_ADDRESS=192.168.5.6
+MYSQL_SQL_ADDRESS=epics-archiver-mysql-db
 
 RETRIEVAL_DEFAULT_PORT=31998
 
