@@ -5,8 +5,10 @@
 # allow the container to finish and end.
 #
 
+# Setup appliance according to its name, passed by the command docker build
+${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
+
 # Before starting Tomcat service, change cluster inet port of mgmt servlet.
-# This change in required only for Kubernetes
 
 if [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
 

@@ -8,7 +8,7 @@
 # Controls Group
 #
 
-FROM gciotto/epics-archiver-generic
+FROM lnlscon/epics-archiver-generic:latest
 
 MAINTAINER Gustavo Ciotto
 
@@ -42,8 +42,5 @@ COPY configuration/context.xml \
 RUN mkdir ${APPLIANCE_FOLDER}/build/cert/
 
 COPY certificate/ ${APPLIANCE_FOLDER}/build/cert/
-
-# Setup appliance according to its name, passed by the command docker build
-RUN ${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
 
 CMD ["sh", "-c", "${APPLIANCE_FOLDER}/build/scripts/tomcat-service.sh"]
