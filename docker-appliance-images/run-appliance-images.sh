@@ -3,7 +3,6 @@
 . ./env-vars-specific.sh
 
 for APPLIANCE in "engine" "retrieval" "etl" "mgmt" 
-#for APPLIANCE in "mgmt" 
 do
 
         CONTAINERS=$(docker ps -a | grep ${DOCKER_RUN_NAME}-${APPLIANCE})
@@ -20,5 +19,5 @@ do
         docker run -d --name=${DOCKER_RUN_NAME}-${APPLIANCE} --dns=10.0.0.71 --dns=10.0.0.72 \
             -p ${APPLIANCE_PORT}:${APPLIANCE_PORT} --network=${NETWORK_ID} \
             --volumes-from=${SHORT_TERM_VOLUME_NAME} --volumes-from=${MEDIUM_TERM_VOLUME_NAME} --volumes-from=${LONG_TERM_VOLUME_NAME} \
-            ${DOCKER_MANTAINER_NAME}/${DOCKER_NAME}-${APPLIANCE}
+            ${DOCKER_MANTAINER_NAME}/${DOCKER_NAME}-${APPLIANCE}:${DOCKER_TAG}
 done
