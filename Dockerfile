@@ -69,18 +69,14 @@ RUN cp ${APPLIANCE_FOLDER}/build/bin/${MYSQL_CONNECTOR}/${MYSQL_CONNECTOR}-bin.j
 
 RUN rm -R ${APPLIANCE_FOLDER}/build/bin/${MYSQL_CONNECTOR}/
 
-RUN mkdir -p ${APPLIANCE_FOLDER}/build/configuration
-
-COPY lnls_appliances.xml \
-     lnls_policies.py \
-     ${APPLIANCE_FOLDER}/build/configuration/
+RUN mkdir -p ${APPLIANCE_FOLDER}/configuration
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/storage
 
 # ARCHAPPL_APPLIANCES is always the same for every image, but ARCHAPPL_MYIDENTITY is not. So it needs to be 
 # defined when the container is started
-ENV ARCHAPPL_APPLIANCES ${APPLIANCE_FOLDER}/build/configuration/lnls_appliances.xml
-ENV ARCHAPPL_POLICIES ${APPLIANCE_FOLDER}/build/configuration/lnls_policies.py
+ENV ARCHAPPL_APPLIANCES ${APPLIANCE_FOLDER}/configuration/lnls_appliances.xml
+ENV ARCHAPPL_POLICIES ${APPLIANCE_FOLDER}/configuration/lnls_policies.py
 ENV ARCHAPPL_SHORT_TERM_FOLDER ${APPLIANCE_FOLDER}/storage/sts
 ENV ARCHAPPL_MEDIUM_TERM_FOLDER ${APPLIANCE_FOLDER}/storage/mts
 ENV ARCHAPPL_LONG_TERM_FOLDER ${APPLIANCE_FOLDER}/storage/lts
