@@ -33,7 +33,7 @@ ENV ARCHAPPL_SITEID lnls-control-archiver
 ENV EPICS_BASE_VERSION 3.15.5
 ENV EPICS_BASE_TAR_NAME base-${EPICS_BASE_VERSION}
 ENV EPICS_BASE_NAME base-${EPICS_BASE_VERSION}
-ENV EPICS_BASE_URL https://www.aps.anl.gov/epics/download/base/${EPICS_BASE_TAR_NAME}.tar.gz
+ENV EPICS_BASE_URL https://epics.anl.gov/download/base/${EPICS_BASE_TAR_NAME}.tar.gz
 ENV EPICS_INSTALL_DIR /opt
 
 ENV EPICS_HOST_ARCH linux-x86_64
