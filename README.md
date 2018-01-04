@@ -10,21 +10,23 @@ change `setup-appliance.sh` up with your LDAP connection settings. The following
 
 ```
 # Appends new realm
-        xmlstarlet ed -L -s '/Server/Service/Engine/Host' -t elem -n "Realm" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionURL" -v "ldap://ad1.abtlus.org.br:389" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "alternativeURL" -v "ldap://ad2.abtlus.org.br:389" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSearch" -v "(sAMAccountName={0})" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSubtree" -v "true" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "userBase" -v "OU=LNLS,DC=abtlus,DC=org,DC=br" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionName" -v "CONNECTION_NAME" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionPassword" -v "CONNECTION_PASSWORD" \
-                         -i '/Server/Service/Engine/Host/Realm' -t attr -n "className" -v "org.apache.catalina.realm.JNDIRealm" \
-${CATALINA_HOME}/conf/server.xml
+xmlstarlet ed -L -s '/Server/Service/Engine/Host' -t elem -n "Realm" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionURL" -v "ldap://ad1.abtlus.org.br:389" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "alternativeURL" -v "ldap://ad2.abtlus.org.br:389" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSearch" -v "(sAMAccountName={0})" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSubtree" -v "true" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "userBase" -v "OU=LNLS,DC=abtlus,DC=org,DC=br" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionName" -v "${CONNECTION_NAME}" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionPassword" -v "${CONNECTION_PASSWORD}" \
+                 -i '/Server/Service/Engine/Host/Realm' -t attr -n "className" -v "org.apache.catalina.realm.JNDIRealm" \
+                 ${CATALINA_HOME}/conf/server.xml
+
 ```
 Besides the LDAP settings, you must edit the following command with your certificate's right password (`PASSWORD`).
 
 ```
-keytool -import -alias tomcat -trustcacerts -storepass PASSWORD -noprompt -keystore $JAVA_HOME/lib/security/cacerts -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt 
+# Imports certificate into trusted keystore
+keytool -import -alias tomcat -trustcacerts -storepass ${CERTIFICATE_PASSWORD} -noprompt -keystore $JAVA_HOME/lib/security/cacerts -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
 ```
 
 ## Running
