@@ -31,7 +31,8 @@ keytool -import -alias tomcat -trustcacerts -storepass ${CERTIFICATE_PASSWORD} -
 
 ## Running
 
-Change to `docker-appliance-images/` and execute `run-appliance-images.sh` to start all appliances. This script should be used only during development. For production, use these images with Docker Compose, Swarm or Kubernetes, according to this [project](https://github.com/lnls-sirius/docker-epics-archiver-composed). Enjoy!
+Use these images with Docker Compose, Swarm or Kubernetes, according to this [project](https://github.com/lnls-sirius/docker-epics-archiver-composed). For development, we suggest to use the
+[docker-compose](https://docs.docker.com/compose/) tool, since no swarm is required. Enjoy!
 
 ## Dockerhub
 
