@@ -36,6 +36,4 @@ COPY configuration/context.xml \
 
 RUN mkdir ${APPLIANCE_FOLDER}/build/cert/
 
-COPY certificate/ ${APPLIANCE_FOLDER}/build/cert/
-
 CMD ["sh", "-c", "${APPLIANCE_FOLDER}/build/scripts/tomcat-service.sh"]

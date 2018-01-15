@@ -5,8 +5,7 @@ Docker containers holding the EPICS archiver appliances.
 ## Building
 
 1) Execute `build-docker-generic-appliance.sh` to build the base image for all the containers which will hold the appliances.
-2) Change the working directory to `docker-appliance-images` and execute `build-docker-appliance-images.sh`. It will build 4 different images, one for each appliance. Before doing that, you'll need to 
-change `setup-appliance.sh` up with your LDAP connection settings. The following command changes the servlet authentication preferences and must be modified with your server settings.
+2) Change the working directory to `docker-appliance-images` and execute `build-docker-appliance-images.sh`. It will build 4 different images, one for each appliance. Before doing that, you may change `setup-appliance.sh` up with your LDAP connection settings. The following command changes the servlet authentication preferences and must be modified with your server settings.
 
 ```
 # Appends new realm
@@ -22,12 +21,15 @@ xmlstarlet ed -L -s '/Server/Service/Engine/Host' -t elem -n "Realm" \
                  ${CATALINA_HOME}/conf/server.xml
 
 ```
-Besides the LDAP settings, you must edit the following command with your certificate's right password (`PASSWORD`).
+Besides the LDAP settings, you may edit the following command with your certificate's right password (`PASSWORD`).
 
 ```
 # Imports certificate into trusted keystore
 keytool -import -alias tomcat -trustcacerts -storepass ${CERTIFICATE_PASSWORD} -noprompt -keystore $JAVA_HOME/lib/security/cacerts -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
 ```
+These variables can be also passed as environment variables when the containers are deployed.
+
+3) Another image containing all 4 appliances is available in `docker-appliance-images-single`. To build it, execute `build-docker-appliance-images-single.sh`. The same considerations about the variables are kept for this case.
 
 ## Running
 
