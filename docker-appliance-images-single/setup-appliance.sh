@@ -3,6 +3,7 @@
 set -a
 set -e
 set -u
+set -x
 
 . ${APPLIANCE_FOLDER}/build/scripts/env-vars.sh
 
@@ -10,24 +11,25 @@ RAND_SRV_PORT=16000
 
 MYSQL_SQL_ADDRESS=$(getent hosts epics-archiver-mysql-db | awk '{ print $1 }')
 
-RETRIEVAL_DEFAULT_PORT=31998
-
 sed -i 's/username=.*$/username=\"'"${MYSQL_USER}"'\"/' ${CATALINA_HOME}/conf/context.xml
 sed -i 's/password=.*$/password=\"'"${MYSQL_PASSWORD}"'\"/' ${CATALINA_HOME}/conf/context.xml
 sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${MYSQL_SQL_ADDRESS}"':'"${MYSQL_PORT}"'\/'"${MYSQL_DATABASE}"'\"/' ${CATALINA_HOME}/conf/context.xml
 
 # Before starting Tomcat service, change all addresses in lnls_appliances.xml.
 # Get local ip address
-IP_ADDRESS=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+#IP_ADDRESS=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+IP_ADDRESS=$(hostname)
 
 # Generates keystore
-keytool -genkey -alias tomcat -keyalg RSA -dname "CN=${IP_ADDRESS}, OU=Controls Group, O=LNLS, L=Campinas, ST=Sao Paulo, C=BR" -storepass ${CERTIFICATE_PASSWORD} -keypass ${CERTIFICATE_PASSWORD} -keystore ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore
+keytool -genkey -alias tomcat -keyalg RSA -dname "CN=${IP_ADDRESS}, OU=Controls Group, O=LNLS, L=Campinas, ST=Sao Paulo, C=BR" -storepass ${CERTIFICATE_PASSWORD} -keypass ${CERTIFICATE_PASSWORD} -keystore ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore -validity 730
 # Copies keystore to conf/
-cp ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore conf/
+cp ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore ${CATALINA_HOME}/conf/
 # Generates certificate
 keytool -exportcert -keystore conf/appliance-mgmt.keystore -alias tomcat -storepass ${CERTIFICATE_PASSWORD} -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
 # Imports certificate into trusted keystore
 keytool -import -alias tomcat -trustcacerts -storepass ${CERTIFICATE_PASSWORD} -noprompt -keystore $JAVA_HOME/lib/security/cacerts -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
+
+sed -i "s:INFO:ALL:g" ${GITHUB_REPOSITORY_FOLDER}/src/sitespecific/lnls-control-archiver/classpathfiles/log4j.properties
 
 for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"
 do
@@ -40,6 +42,8 @@ do
     mkdir -p ${CATALINA_HOME}/${APPLIANCE_UNIT}/logs
     mkdir -p ${CATALINA_HOME}/${APPLIANCE_UNIT}/temp
     mkdir -p ${CATALINA_HOME}/${APPLIANCE_UNIT}/work
+
+    sed -i "s:FINE:ALL:g" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/logging.properties
 
     xmlstarlet ed -L -u '/Server/@port' -v ${RAND_SRV_PORT} ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
@@ -80,6 +84,8 @@ do
 
             xmlstarlet ed -L -s '/Server/Service/Connector[@port='"${APPLIANCE_PORT}"']' -t elem -n "SSLHostConfig" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
+            cp ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf
+
             xmlstarlet ed -L -s '/Server/Service/Connector[@port='"${APPLIANCE_PORT}"']/SSLHostConfig' -t elem -n "Certificate" \
                              -i '/Server/Service/Connector[@port='"${APPLIANCE_PORT}"']/SSLHostConfig/Certificate' -t attr -n "certificateKeystoreFile" -v "conf/appliance-mgmt.keystore" \
                              -i '/Server/Service/Connector[@port='"${APPLIANCE_PORT}"']/SSLHostConfig/Certificate' -t attr -n "type" -v "RSA" \
@@ -99,7 +105,7 @@ do
 
 	    # Changes viewer's url port
 	    RETRIEVAL_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/retrieval_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//" ) 
-	    sed -i "s:${RETRIEVAL_DEFAULT_PORT}/retrieval:${RETRIEVAL_PORT}/retrieval:" ${GITHUB_REPOSITORY_FOLDER}/src/main/org/epics/archiverappliance/mgmt/staticcontent/js/mgmt.js
+	    sed -i 's#var dataRetrievalURL = .*$#var dataRetrievalURL = window.location.port != "" \&\& window.location.port > 0 ? "http:" + window.location.href.split(":")[1] + ":'"${RETRIEVAL_PORT}"'/retrieval" :  "http://" + window.location.hostname + "/retrieval";#g' ${GITHUB_REPOSITORY_FOLDER}/src/main/org/epics/archiverappliance/mgmt/staticcontent/js/mgmt.js
     fi
 
     # Change wardest and dist properties in build.xml to ./
