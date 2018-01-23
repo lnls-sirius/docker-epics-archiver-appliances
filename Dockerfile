@@ -49,7 +49,7 @@ COPY env-vars.sh \
 RUN ${APPLIANCE_FOLDER}/build/scripts/setup-epics.sh
 
 # Github repository variables
-ENV GITHUB_APPLIANCES_BRANCH ldap-login
+ENV GITHUB_APPLIANCES_BRANCH master
 ENV GITHUB_REPOSITORY_FOLDER /opt/epicsarchiverap-ldap
 ENV GITHUB_REPOSITORY_URL https://github.com/lnls-sirius/epicsarchiverap-ldap.git
 
