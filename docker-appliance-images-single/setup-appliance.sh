@@ -5,8 +5,6 @@ set -e
 set -u
 set -x
 
-. ${APPLIANCE_FOLDER}/build/scripts/env-vars.sh
-
 RAND_SRV_PORT=16000
 
 MYSQL_SQL_ADDRESS=$(getent hosts epics-archiver-mysql-db | awk '{ print $1 }')
@@ -96,17 +94,23 @@ do
 
                  # Appends new realm
                  xmlstarlet ed -L -s '/Server/Service/Engine/Host' -t elem -n "Realm" \
-                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionURL" -v "ldap://ad1.abtlus.org.br:389" \
-                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "alternativeURL" -v "ldap://ad2.abtlus.org.br:389" \
-                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSearch" -v "(sAMAccountName={0})" \
+                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionURL" -v "${CONNECTION_URL}" \
+                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "alternativeURL" -v "${ALTERNATIVE_URL}" \
+                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSearch" -v "${CONNECTION_USER_FILTER}" \
                                   -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSubtree" -v "true" \
-                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "userBase" -v "OU=LNLS,DC=abtlus,DC=org,DC=br" \
-                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionName" -v "${CONNECTION_NAME}" \
-                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionPassword" -v "${CONNECTION_PASSWORD}" \
+                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "userBase" -v "${CONNECTION_USER_BASE}" \
                                   -i '/Server/Service/Engine/Host/Realm' -t attr -n "className" -v "org.apache.catalina.realm.JNDIRealm" \
                                   ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
-                (cd ${GITHUB_REPOSITORY_FOLDER}; git checkout ldap-login)
+                 if [ ! -z ${CONNECTION_NAME+x} ]; then
+                     xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionName" -v "${CONNECTION_NAME}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+                 fi
+
+                 if [ !	-z ${CONNECTION_PASSWORD+x} ]; then
+                     xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionPassword" -v "${CONNECTION_PASSWORD}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+                 fi 
+
+                 (cd ${GITHUB_REPOSITORY_FOLDER}; git checkout ldap-login)
 
             else
 

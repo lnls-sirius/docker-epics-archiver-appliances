@@ -31,10 +31,23 @@ However, the suggested approach is to pass those parameters as environment varia
 
 3) Another image containing all 4 appliances is available in `docker-appliance-images-single`. To build it, execute `build-docker-appliance-images-single.sh`. The same considerations about the variables are kept for this case.
 
+## Environment variables
+
+This image requires the following parameters when it is executed:
+
+1) `USE_AUTHENTICATION` (`true` or `false`): variable that determines if a LDAP server should be used.
+2) `CERTIFICATE_PASSWORD` is the self-signed certificate's password. 
+3) `CONNECTION_URL` and `ALTERNATIVE_URL` are LDAP server addresses. Used when `USE_AUTHENTICATION=true` only.
+4) `CONNECTION_USER_FILTER` is the user filter. Used when `USE_AUTHENTICATION=true` only.
+5) `CONNECTION_USER_BASE` is the LDAP user base distinguished name. Used when `USE_AUTHENTICATION=true` only.
+6) `CONNECTION_NAME` is the binding distinguished name used for LDAP authentication. Used when `USE_AUTHENTICATION=true` only.
+7) `CONNECTION_PASSWORD` is the binding password. Used when `USE_AUTHENTICATION=true` only.
+8) `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` and `MYSQL_PORT` set the MySQL database connection.
+9) `JAVA_OPTS` should be used when eventual JVM parameters need to be used.
+
 ## Running
 
-Use these images with Docker Compose, Swarm or Kubernetes, according to this [project](https://github.com/lnls-sirius/docker-epics-archiver-composed). For development, we suggest to use the
-[docker-compose](https://docs.docker.com/compose/) tool, since no swarm is required. Enjoy!
+Use these images with Docker Compose, Swarm or Kubernetes, according to this [project](https://github.com/lnls-sirius/docker-epics-archiver-composed). For development, we suggest to use the [docker-compose](https://docs.docker.com/compose/) tool, since no swarm is required. Enjoy!
 
 ## Dockerhub
 
