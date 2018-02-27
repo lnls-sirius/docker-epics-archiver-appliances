@@ -6,7 +6,6 @@
 # LNLS - Brazilian Synchrotron Light Source
 # Controls Group
 #
-# TODO: Remove source files required to build the image. It are kept for now only for developmente purposes.
 #
 
 FROM tomcat:9
@@ -41,8 +40,7 @@ ENV EPICS_INSTALL_DIR /opt/base-3.14.12.6/bin/${EPICS_HOST_ARCH}
 ENV EPICS_BASE ${EPICS_INSTALL_DIR}/${EPICS_BASE_NAME}
 ENV PATH ${EPICS_INSTALL_DIR}/${EPICS_BASE_NAME}/bin/${EPICS_HOST_ARCH}:$PATH
 
-COPY env-vars.sh \
-     setup-epics.sh \
+COPY setup-epics.sh \
      ${APPLIANCE_FOLDER}/build/scripts/
 
 # Install EPICS base

@@ -12,12 +12,6 @@ FROM lnlscon/epics-archiver-generic:latest
 
 MAINTAINER Gustavo Ciotto
 
-USER root
-
-ARG ARCHAPPL_MYIDENTITY=lnls_control_appliance_1
-
-ENV ARCHAPPL_MYIDENTITY ${ARCHAPPL_MYIDENTITY}
-
 # user root is required to install all needed packages
 USER root
 
