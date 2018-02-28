@@ -11,6 +11,14 @@ RETRIEVAL_DEFAULT_PORT=31998
 
 APPLIANCE_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//" ) 
 
+if [ "${USE_AUTHENTICATION}" = true ]; then
+        GITHUB_APPLIANCES_BRANCH=${GITHUB_APPLIANCES_BRANCH:-ldap-login}
+else
+        GITHUB_APPLIANCES_BRANCH=${GITHUB_APPLIANCES_BRANCH:-master}
+fi
+
+(cd ${GITHUB_REPOSITORY_FOLDER}; git config user.email "controle@lnls.br"; git config user.name "Controls Group"; git fetch origin ${GITHUB_APPLIANCES_BRANCH}; git checkout ${GITHUB_APPLIANCES_BRANCH})
+
 # Before starting Tomcat service, change all addresses in lnls_appliances.xml.
 # Get local ip address
 # IP_ADDRESS=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
@@ -69,8 +77,6 @@ elif [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
            if [ ! -z ${CONNECTION_PASSWORD+x} ]; then
                  xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionPassword" -v "${CONNECTION_PASSWORD}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
            fi
-
-           (cd ${GITHUB_REPOSITORY_FOLDER}; git checkout ldap-login)
 
         else
 

@@ -21,6 +21,14 @@ IP_ADDRESS=$(hostname)
 # For debugging
 # sed -i "s:INFO:ALL:g" ${GITHUB_REPOSITORY_FOLDER}/src/sitespecific/lnls-control-archiver/classpathfiles/log4j.properties
 
+if [ "${USE_AUTHENTICATION}" = true ]; then
+        GITHUB_APPLIANCES_BRANCH=${GITHUB_APPLIANCES_BRANCH:-ldap-login}
+else
+        GITHUB_APPLIANCES_BRANCH=${GITHUB_APPLIANCES_BRANCH:-master}
+fi
+
+(cd ${GITHUB_REPOSITORY_FOLDER}; git config user.email "controle@lnls.br"; git config user.name "Controls Group"; git fetch origin ${GITHUB_APPLIANCES_BRANCH}; git checkout ${GITHUB_APPLIANCES_BRANCH})
+
 for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"
 do
 
@@ -109,8 +117,6 @@ do
                  if [ !	-z ${CONNECTION_PASSWORD+x} ]; then
                      xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionPassword" -v "${CONNECTION_PASSWORD}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
                  fi 
-
-                 (cd ${GITHUB_REPOSITORY_FOLDER}; git checkout ldap-login)
 
             else
 

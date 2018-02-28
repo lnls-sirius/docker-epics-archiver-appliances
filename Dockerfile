@@ -47,12 +47,11 @@ COPY setup-epics.sh \
 RUN ${APPLIANCE_FOLDER}/build/scripts/setup-epics.sh
 
 # Github repository variables
-ENV GITHUB_APPLIANCES_BRANCH master
 ENV GITHUB_REPOSITORY_FOLDER /opt/epicsarchiverap-ldap
 ENV GITHUB_REPOSITORY_URL https://github.com/lnls-sirius/epicsarchiverap-ldap.git
 
 # Clone archiver github's repository
-RUN git clone --branch=${GITHUB_APPLIANCES_BRANCH} ${GITHUB_REPOSITORY_URL} ${GITHUB_REPOSITORY_FOLDER}
+RUN git clone ${GITHUB_REPOSITORY_URL} ${GITHUB_REPOSITORY_FOLDER}
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/build/bin
 
