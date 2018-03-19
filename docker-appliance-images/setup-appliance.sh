@@ -63,12 +63,31 @@ elif [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
             # Appends new realm
             xmlstarlet ed -L -s '/Server/Service/Engine/Host' -t elem -n "Realm" \
                              -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionURL" -v "${CONNECTION_URL}" \
-                             -i '/Server/Service/Engine/Host/Realm' -t attr -n "alternativeURL" -v "${ALTERNATIVE_URL}" \
                              -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSearch" -v "${CONNECTION_USER_FILTER}" \
                              -i '/Server/Service/Engine/Host/Realm' -t attr -n "userSubtree" -v "true" \
                              -i '/Server/Service/Engine/Host/Realm' -t attr -n "userBase" -v "${CONNECTION_USER_BASE}" \
                              -i '/Server/Service/Engine/Host/Realm' -t attr -n "className" -v "org.apache.catalina.realm.JNDIRealm" \
                              ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+
+           if [ ! -z ${ALTERNATIVE_URL+x} ]; then
+                 xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "alternativeURL" -v "${ALTERNATIVE_URL}" \
+                                   ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+           fi
+
+           if [ ! -z ${CONNECTION_ROLE_BASE+x} ]; then
+                 xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "roleBase" -v "${CONNECTION_ROLE_BASE}" \
+                                  -i '/Server/Service/Engine/Host/Realm' -t attr -n "roleSubtree" -v "true" \
+                                   ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+           fi
+
+           if [ ! -z ${CONNECTION_ROLE_NAME+x} ]; then
+                 xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "roleName" -v "${CONNECTION_ROLE_NAME}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+           fi
+
+           if [ ! -z ${CONNECTION_ROLE_SEARCH+x} ]; then
+                 xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "roleSearch" -v "${CONNECTION_ROLE_SEARCH}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+           fi
+
 
            if [ ! -z ${CONNECTION_NAME+x} ]; then
                  xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionName" -v "${CONNECTION_NAME}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
