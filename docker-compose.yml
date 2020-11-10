@@ -1,7 +1,8 @@
 version: "3.7"
 services:
-  base:
-    image: lnlscon/epics-archiver-base:v1.3-dev
+  base: # Base image for the appliances
+    image: lnlscon/epics-archiver-base:v1.0-dev
+    command: sleep infinity
     build:
       context: "."
       dockerfile: "Dockerfile"
@@ -9,14 +10,47 @@ services:
         - "br.com.lnls-sirius.department=GCS"
         - "br.com.lnls-sirius.description=Archiver appliances"
         - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
-        - "br.com.lnls-sirius.repo=https://github.com/carneirofc/docker-epics-archiver-appliances"
-# appliance:
-#   image: lnlscon/epics-archiver-appliances:v1.0
-#   build:
-#     context: "./archiver"
-#     dockerfile: "Dockerfile.APPLIANCE"
-#     labels:
-#       - "br.com.lnls-sirius.department=GCS"
-#       - "br.com.lnls-sirius.description=Archiver appliances"
-#       - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
-#       - "br.com.lnls-sirius.repo=https://github.com/carneirofc/docker-epics-archiver-appliances"
+        - "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
+
+  single: # Single container appliances
+    image: lnlscon/epics-archiver-single:v1.0-dev
+    env_file: 
+      - ./.sql.env
+    build:
+      context: "./docker-appliance-images-single"
+      dockerfile: "Dockerfile"
+      args:
+        - BASE_VER=v1.0-dev
+      labels:
+        - "br.com.lnls-sirius.department=GCS"
+        - "br.com.lnls-sirius.description=Archiver appliances"
+        - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
+        - "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - ./lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
+      - ./lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
+      - ./archiver/conf/log4j.properties:/opt/epics-archiver-appliances/configuration/log4j.properties:ro
+    
+    networks:
+      - hostnet
+
+  epics-archiver-mysql-db:
+    image: lnlscon/epics-archiver-mysql-db:latest
+    env_file: 
+      - ./.sql.env
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - ./db:/var/lib/mysql:rw
+    deploy:
+      mode: replicated
+      replicas: 1
+    networks:
+      - hostnet
+
+networks:
+  hostnet:
+    external:
+      name: "host"
