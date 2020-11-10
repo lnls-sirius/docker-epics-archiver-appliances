@@ -16,8 +16,7 @@ ${APPLIANCE_FOLDER}/build/configuration/wait-for-it/wait-for-it.sh epics-archive
 # Setup all appliances
 ${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
 
-for APPLIANCE_UNIT in "engine" "retrieval" "etl" "mgmt"
-do
+for APPLIANCE_UNIT in "engine" "retrieval" "etl" "mgmt"; do
     export CATALINA_BASE=${CATALINA_HOME}/${APPLIANCE_UNIT}
     ${CATALINA_HOME}/bin/catalina.sh start
 done

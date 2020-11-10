@@ -1,16 +1,9 @@
-#
 # Docker image for mgmt, retrieval, etl and engine servlets. It receives two
 # arguments: the first is the name of the appliance this image will belong to and
 # the second is the name of the appliance (mgmt, retrieval, etl or engine).
-# 
-# Gustavo Ciotto Pinton
-# LNLS - Brazilian Synchrotron Light Source
-# Controls Group
-#
 
-FROM lnlscon/epics-archiver-generic:latest
-
-MAINTAINER Gustavo Ciotto
+ARG BASE_VER=
+FROM lnlscon/epics-archiver-base:${BASE_VER}
 
 # user root is required to install all needed packages
 USER root
