@@ -36,7 +36,7 @@ However, the suggested approach is to pass those parameters as environment varia
 This image requires the following parameters when it is executed:
 
 1) `USE_AUTHENTICATION` (`true` or `false`): variable that determines if a LDAP server should be used.
-2) `CERTIFICATE_PASSWORD` is the self-signed certificate's password. 
+2) `CERTIFICATE_PASSWORD` is the self-signed certificate's password.
 3) `CONNECTION_URL` and `ALTERNATIVE_URL` are LDAP server addresses. Used when `USE_AUTHENTICATION=true` only.
 4) `CONNECTION_USER_FILTER` is the user filter. Used when `USE_AUTHENTICATION=true` only.
 5) `CONNECTION_USER_BASE` is the LDAP user base distinguished name. Used when `USE_AUTHENTICATION=true` only.

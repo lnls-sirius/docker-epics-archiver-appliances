@@ -2,7 +2,7 @@
 # Docker image for mgmt, retrieval, etl and engine servlets. It receives two
 # arguments: the first is the name of the appliance this image will belong to and
 # the second is the name of the appliance (mgmt, retrieval, etl or engine).
-# 
+#
 # Gustavo Ciotto Pinton
 # LNLS - Brazilian Synchrotron Light Source
 # Controls Group
