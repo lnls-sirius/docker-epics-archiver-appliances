@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  base:
+    image: lnlscon/epics-archiver-base:v1.3-dev
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+      labels:
+        - "br.com.lnls-sirius.department=GCS"
+        - "br.com.lnls-sirius.description=Archiver appliances"
+        - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
+        - "br.com.lnls-sirius.repo=https://github.com/carneirofc/docker-epics-archiver-appliances"
+# appliance:
+#   image: lnlscon/epics-archiver-appliances:v1.0
+#   build:
+#     context: "./archiver"
+#     dockerfile: "Dockerfile.APPLIANCE"
+#     labels:
+#       - "br.com.lnls-sirius.department=GCS"
+#       - "br.com.lnls-sirius.description=Archiver appliances"
+#       - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
+#       - "br.com.lnls-sirius.repo=https://github.com/carneirofc/docker-epics-archiver-appliances"
