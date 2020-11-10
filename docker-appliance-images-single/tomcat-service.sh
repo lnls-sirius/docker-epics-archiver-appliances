@@ -1,10 +1,6 @@
 #!/bin/sh
-
-#
 # A simple script to start tomcat service. This script blocks and does not
 # allow the container to finish and end.
-#
-
 set -a
 set -e
 set -u
@@ -16,8 +12,11 @@ ${APPLIANCE_FOLDER}/build/configuration/wait-for-it/wait-for-it.sh epics-archive
 # Setup all appliances
 ${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
 
+export JMX_PORT=9000
 for APPLIANCE_UNIT in "engine" "retrieval" "etl" "mgmt"; do
     export CATALINA_BASE=${CATALINA_HOME}/${APPLIANCE_UNIT}
+    export CATALINA_OPTS="${JAVA_OPTS} -Dlog4j.debug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=${JMX_PORT} -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
+    JMX_PORT=$((JMX_PORT + 1))
     ${CATALINA_HOME}/bin/catalina.sh start
 done
 

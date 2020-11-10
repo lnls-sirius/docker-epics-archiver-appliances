@@ -17,9 +17,6 @@ sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${MYSQL_SQL_ADDRESS}"':'"${MYSQL_PORT}"
 #IP_ADDRESS=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 IP_ADDRESS=$(hostname)
 
-# For debugging
-# sed -i "s:INFO:ALL:g" ${GITHUB_REPOSITORY_FOLDER}/src/sitespecific/lnls-control-archiver/classpathfiles/log4j.properties
-
 if [ "${USE_AUTHENTICATION}" = true ]; then
     GITHUB_APPLIANCES_BRANCH=${GITHUB_APPLIANCES_BRANCH:-ldap-login}
 else
@@ -44,8 +41,6 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
     mkdir -p ${CATALINA_HOME}/${APPLIANCE_UNIT}/logs
     mkdir -p ${CATALINA_HOME}/${APPLIANCE_UNIT}/temp
     mkdir -p ${CATALINA_HOME}/${APPLIANCE_UNIT}/work
-
-    sed -i "s:FINE:ALL:g" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/logging.properties
 
     xmlstarlet ed -L -u '/Server/@port' -v ${RAND_SRV_PORT} ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 

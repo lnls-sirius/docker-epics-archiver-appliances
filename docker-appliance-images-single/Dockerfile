@@ -18,8 +18,7 @@ COPY setup-appliance.sh \
      tomcat-service.sh \
      ${APPLIANCE_FOLDER}/build/scripts/
 
-COPY configuration/context.xml \
-     ${CATALINA_HOME}/conf/context.xml
+COPY configuration/context.xml ${CATALINA_HOME}/conf/context.xml
 
 RUN mkdir ${APPLIANCE_FOLDER}/build/cert/
 

@@ -1,0 +1,10 @@
+<appliances><appliance>
+     <identity>lnls_control_appliance_1</identity>
+     <cluster_inetport>192.168.5.5:12000</cluster_inetport>
+     <mgmt_url>https://192.168.5.5:11995/mgmt/bpl</mgmt_url>
+     <engine_url>http://192.168.5.7:11996/engine/bpl</engine_url>
+     <etl_url>http://192.168.5.9:11997/etl/bpl</etl_url>
+     <retrieval_url>http://192.168.5.11:11998/retrieval/bpl</retrieval_url>
+     <data_retrieval_url>http://192.168.5.11:11998/retrieval</data_retrieval_url>
+   </appliance>
+ </appliances>
