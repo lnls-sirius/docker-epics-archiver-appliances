@@ -13,6 +13,7 @@ services:
         - "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
 
   single: # Single container appliances
+    hostname: epics-archiver
     image: lnlscon/epics-archiver-single:v1.0-dev
     env_file: 
       - ./.sql.env
@@ -33,6 +34,7 @@ services:
         - "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
 
   epics-archiver-mysql-db:
+    hostname: epics-archiver-mysql-db
     image: lnlscon/epics-archiver-mysql-db:latest
     env_file: 
       - ./.sql.env
