@@ -4,6 +4,8 @@
 
 ARG BASE_VER=
 FROM lnlscon/epics-archiver-base:${BASE_VER}
+RUN update-ca-trust extract \
+  && ln -fs /etc/pki/ca-trust/extracted/java/cacerts ${JAVA_HOME}/jre/lib/security/cacerts
 
 # user root is required to install all needed packages
 USER root

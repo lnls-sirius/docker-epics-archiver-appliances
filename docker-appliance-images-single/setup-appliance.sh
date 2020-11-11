@@ -10,9 +10,11 @@ RAND_SRV_PORT=16000
 
 set -u
 
-sed -i 's/username=.*$/username=\"'"${MYSQL_USER}"'\"/' ${CATALINA_HOME}/conf/context.xml
-sed -i 's/password=.*$/password=\"'"${MYSQL_PASSWORD}"'\"/' ${CATALINA_HOME}/conf/context.xml
-sed -i 's/url=.*$/url=\"jdbc:mysql:\/\/'"${MYSQL_SQL_ADDRESS}"':'"${MYSQL_PORT}"'\/'"${MYSQL_DATABASE}"'\"/' ${CATALINA_HOME}/conf/context.xml
+# setup database connection
+xmlstarlet ed --inplace --update "/Context/Resource[@name='jdbc/archappl']/@username" --value "${MYSQL_USER}" ${CATALINA_HOME}/conf/context.xml
+xmlstarlet ed --inplace --update "/Context/Resource[@name='jdbc/archappl']/@password" --value "${MYSQL_PASSWORD}" ${CATALINA_HOME}/conf/context.xml
+xmlstarlet ed --inplace --update "/Context/Resource[@name='jdbc/archappl']/@url" \
+	    --value "jdbc:mysql://${MYSQL_SQL_ADDRESS}:${MYSQL_PORT}/${MYSQL_DATABASE}" ${CATALINA_HOME}/conf/context.xml
 
 # Before starting Tomcat service, change all addresses in lnls_appliances.xml.
 # Get local ip address
