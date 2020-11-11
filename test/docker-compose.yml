@@ -2,7 +2,7 @@ version: "3.7"
 services:
   single: # Single container appliances
     hostname: epics-archiver
-    image: lnlscon/epics-archiver-single:v1.0-dev
+    image: lnlscon/epics-archiver-single:v2.0-dev
     env_file: 
       - ../.archiver.env
       - ../.ldap.env
