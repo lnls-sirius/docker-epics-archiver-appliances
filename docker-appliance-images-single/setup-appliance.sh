@@ -1,12 +1,14 @@
 #!/bin/sh
 set -a
 set -e
-set -u
 set -x
 
 RAND_SRV_PORT=16000
 
-MYSQL_SQL_ADDRESS=$(getent hosts epics-archiver-mysql-db | awk '{ print $1 }')
+[ -z "$MYSQL_SQL_ADDRESS" ] && MYSQL_SQL_ADDRESS=$(getent hosts epics-archiver-mysql-db | awk '{ print $1 }') && echo "Using default MYSQL_SQL_ADDRESS=${MYSQL_SQL_ADDRESS}"
+[ -z "$MYSQL_PORT" ] && MYSQL_PORT=3306 && echo "Using default MYSQL_PORT=${MYSQL_PORT}"
+
+set -u
 
 sed -i 's/username=.*$/username=\"'"${MYSQL_USER}"'\"/' ${CATALINA_HOME}/conf/context.xml
 sed -i 's/password=.*$/password=\"'"${MYSQL_PASSWORD}"'\"/' ${CATALINA_HOME}/conf/context.xml
@@ -66,13 +68,36 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
         if [ "${USE_AUTHENTICATION}" = true ]; then
 
             # Generates keystore
-            keytool -genkey -alias tomcat -keyalg RSA -dname "CN=${IP_ADDRESS}, OU=Controls Group, O=LNLS, L=Campinas, ST=Sao Paulo, C=BR" -storepass ${CERTIFICATE_PASSWORD} -keypass ${CERTIFICATE_PASSWORD} -keystore ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore -validity 730
+            keytool \
+		    -genkey\
+		    -alias tomcat\
+		    -keyalg RSA\
+		    -dname "CN=${IP_ADDRESS}, OU=Controls Group, O=LNLS, L=Campinas, ST=Sao Paulo, C=BR"\
+		    -storepass ${CERTIFICATE_PASSWORD}\
+		    -keypass ${CERTIFICATE_PASSWORD}\
+		    -keystore ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore\
+		    -validity 730
+
             # Copies keystore to conf/
             cp ${APPLIANCE_FOLDER}/build/cert/appliance-mgmt.keystore ${CATALINA_HOME}/conf/
+
             # Generates certificate
-            keytool -exportcert -keystore conf/appliance-mgmt.keystore -alias tomcat -storepass ${CERTIFICATE_PASSWORD} -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
+            keytool \
+		    -exportcert\
+		    -keystore conf/appliance-mgmt.keystore\
+		    -alias tomcat\
+		    -storepass ${CERTIFICATE_PASSWORD}\
+		    -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
+
             # Imports certificate into trusted keystore
-            keytool -import -alias tomcat -trustcacerts -storepass ${CERTIFICATE_PASSWORD} -noprompt -keystore $JAVA_HOME/lib/security/cacerts -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
+            keytool \
+		    -import\
+		    -alias tomcat\
+		    -trustcacerts\
+		    -storepass ${CERTIFICATE_PASSWORD}\
+		    -noprompt\
+		    -keystore /etc/pki/ca-trust/extracted/java/cacerts \
+		    -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
 
             xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" -v "https://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
 
