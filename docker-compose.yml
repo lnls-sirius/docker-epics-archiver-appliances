@@ -16,6 +16,11 @@ services:
     image: lnlscon/epics-archiver-single:v1.0-dev
     env_file: 
       - ./.sql.env
+      - ./.ldap.env
+      - ./.archiver.env
+    volumes:
+      - ./docker-appliance-images-single/configuration/lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
+      - ./docker-appliance-images-single/configuration/lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
     build:
       context: "./docker-appliance-images-single"
       dockerfile: "Dockerfile"
@@ -26,31 +31,11 @@ services:
         - "br.com.lnls-sirius.description=Archiver appliances"
         - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
         - "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
-    deploy:
-      mode: replicated
-      replicas: 1
-    volumes:
-      - ./lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
-      - ./lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
-      - ./archiver/conf/log4j.properties:/opt/epics-archiver-appliances/configuration/log4j.properties:ro
-    
-    networks:
-      - hostnet
 
   epics-archiver-mysql-db:
     image: lnlscon/epics-archiver-mysql-db:latest
     env_file: 
       - ./.sql.env
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
+      - /etc/localtime:/etc/localtime:ro
       - ./db:/var/lib/mysql:rw
-    deploy:
-      mode: replicated
-      replicas: 1
-    networks:
-      - hostnet
-
-networks:
-  hostnet:
-    external:
-      name: "host"

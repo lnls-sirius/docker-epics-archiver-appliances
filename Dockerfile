@@ -11,12 +11,13 @@ ENV TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Updates default image and install required packages
-RUN yum -y update && \
-     yum install -y \
+RUN amazon-linux-extras enable epel && yum clean metadata && yum install -y epel-release &&\
+    yum install -y \
      ant \
      gcc \
      gcc-c++ \
      git \
+     hostname \
      libreadline-dev \
      make \
      make\
