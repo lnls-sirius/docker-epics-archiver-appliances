@@ -24,6 +24,7 @@ RUN amazon-linux-extras enable epel && yum clean metadata && yum install -y epel
      perl \
      tar \
      tzdata \
+     tzdata-java \
      wget \
      xmlstarlet \
      &&\
