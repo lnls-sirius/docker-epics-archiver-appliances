@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+  base: # Base image for the appliances
+    image: lnlscon/epics-archiver-base:v2.3
+    command: sleep infinity
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+      labels:
+        - "br.com.lnls-sirius.department=GCS"
+        - "br.com.lnls-sirius.description=Archiver appliances"
+        - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
+        - "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
+
+  single: # Single container appliances
+    hostname: epics-archiver
+    image: lnlscon/epics-archiver-single:v2.4
+    env_file: 
+      - ./.sql.env
+      - ./.ldap.env
+      - ./.archiver.env
+    volumes:
+      - ./docker-appliance-images-single/configuration/lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
+      - ./docker-appliance-images-single/configuration/lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
+    build:
+      context: "./docker-appliance-images-single"
+      dockerfile: "Dockerfile"
+      args:
+        - BASE_VER=v2.1-dev
+      labels:
+        - "br.com.lnls-sirius.department=GCS"
+        - "br.com.lnls-sirius.description=Archiver appliances"
+        - "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
+        - "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
+
+  epics-archiver-mysql-db:
+    hostname: epics-archiver-mysql-db
+    image: lnlscon/epics-archiver-mysql-db:latest
+    env_file: 
+      - ./.sql.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./db:/var/lib/mysql:rw

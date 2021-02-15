@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<appliances>
+  <appliance>
+    <identity>lnls_control_appliance_1</identity>
+    <cluster_inetport>epics-archiver:12000</cluster_inetport>
+    <mgmt_url>https://epics-archiver:11995/mgmt/bpl</mgmt_url>
+    <engine_url>http://epics-archiver:11996/engine/bpl</engine_url>
+    <etl_url>http://epics-archiver:11997/etl/bpl</etl_url>
+    <retrieval_url>http://epics-archiver:11998/retrieval/bpl</retrieval_url>
+    <data_retrieval_url>http://epics-archiver:11998/retrieval</data_retrieval_url>
+  </appliance>
+</appliances>

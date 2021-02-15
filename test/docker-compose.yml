@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  single: # Single container appliances
+    hostname: epics-archiver
+    image: lnlscon/epics-archiver-single:v2.0-dev
+    env_file: 
+      - ../.archiver.env
+      - ../.ldap.env
+      - ../.sql.env
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - ../docker-appliance-images-single/configuration/lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
+      - ../docker-appliance-images-single/configuration/lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
+#     - :/usr/local/tomcat/engine/webapps/engine/WEB-INF/classes/log4j.properties
+#     - :/usr/local/tomcat/mgmt/webapps/mgmt/WEB-INF/classes/log4j.properties
+#     - :/usr/local/tomcat/etl/webapps/etl/WEB-INF/classes/log4j.properties
+#     - :/usr/local/tomcat/retrieval/webapps/retrieval/WEB-INF/classes/log4j.properties
+    networks:
+      - hostnet
+
+  epics-archiver-mysql-db:
+    hostname: epics-archiver
+    image: lnlscon/epics-archiver-mysql-db:latest
+    env_file: 
+      - ../.sql.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../db:/var/lib/mysql:rw
+    deploy:
+      mode: replicated
+      replicas: 1
+    networks:
+      - hostnet
+
+networks:
+  hostnet:
+    external:
+      name: "host"

@@ -36,7 +36,7 @@ However, the suggested approach is to pass those parameters as environment varia
 This image requires the following parameters when it is executed:
 
 1) `USE_AUTHENTICATION` (`true` or `false`): variable that determines if a LDAP server should be used.
-2) `CERTIFICATE_PASSWORD` is the self-signed certificate's password. 
+2) `CERTIFICATE_PASSWORD` is the self-signed certificate's password.
 3) `CONNECTION_URL` and `ALTERNATIVE_URL` are LDAP server addresses. Used when `USE_AUTHENTICATION=true` only.
 4) `CONNECTION_USER_FILTER` is the user filter. Used when `USE_AUTHENTICATION=true` only.
 5) `CONNECTION_USER_BASE` is the LDAP user base distinguished name. Used when `USE_AUTHENTICATION=true` only.
@@ -44,6 +44,7 @@ This image requires the following parameters when it is executed:
 7) `CONNECTION_PASSWORD` is the binding password. Used when `USE_AUTHENTICATION=true` only.
 8) `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` and `MYSQL_PORT` set the MySQL database connection.
 9) `JAVA_OPTS` should be used when eventual JVM parameters need to be used.
+10) `APPLIANCE_BASE_MX_PORT` base JMX port used when launching each appliance. For each appliance the port will increase by one.
 
 ## Running
 
