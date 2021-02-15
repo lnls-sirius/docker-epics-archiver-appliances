@@ -12,7 +12,7 @@ ${APPLIANCE_FOLDER}/build/configuration/wait-for-it/wait-for-it.sh epics-archive
 # Setup all appliances
 ${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
 
-export JMX_PORT=9000
+export JMX_PORT=${APPLIANCE_BASE_JMX_PORT}
 for APPLIANCE_UNIT in "engine" "retrieval" "etl" "mgmt"; do
     echo "Appliance ${APPLIANCE_UNIT}, JMX_PORT=${JMX_PORT}"
     export CATALINA_BASE=${CATALINA_HOME}/${APPLIANCE_UNIT}

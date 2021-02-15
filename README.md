@@ -44,6 +44,7 @@ This image requires the following parameters when it is executed:
 7) `CONNECTION_PASSWORD` is the binding password. Used when `USE_AUTHENTICATION=true` only.
 8) `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` and `MYSQL_PORT` set the MySQL database connection.
 9) `JAVA_OPTS` should be used when eventual JVM parameters need to be used.
+10) `APPLIANCE_BASE_MX_PORT` base JMX port used when launching each appliance. For each appliance the port will increase by one.
 
 ## Running
 

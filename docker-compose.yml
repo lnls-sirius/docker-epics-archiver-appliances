@@ -1,7 +1,7 @@
 version: "3.7"
 services:
   base: # Base image for the appliances
-    image: lnlscon/epics-archiver-base:v1.0-dev
+    image: lnlscon/epics-archiver-base:v2.3
     command: sleep infinity
     build:
       context: "."
@@ -14,7 +14,7 @@ services:
 
   single: # Single container appliances
     hostname: epics-archiver
-    image: lnlscon/epics-archiver-single:v2.0-dev
+    image: lnlscon/epics-archiver-single:v2.4
     env_file: 
       - ./.sql.env
       - ./.ldap.env
@@ -26,7 +26,7 @@ services:
       context: "./docker-appliance-images-single"
       dockerfile: "Dockerfile"
       args:
-        - BASE_VER=v1.0-dev
+        - BASE_VER=v2.1-dev
       labels:
         - "br.com.lnls-sirius.department=GCS"
         - "br.com.lnls-sirius.description=Archiver appliances"

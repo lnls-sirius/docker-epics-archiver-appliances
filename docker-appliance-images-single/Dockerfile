@@ -10,6 +10,7 @@ RUN update-ca-trust extract \
 # user root is required to install all needed packages
 USER root
 
+ENV APPLIANCE_BASE_JMX_PORT 9050
 ENV APPLIANCE_NAME epics-archiver-appliances
 
 ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
