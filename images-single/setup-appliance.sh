@@ -98,7 +98,7 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
 		    -trustcacerts\
 		    -storepass ${CERTIFICATE_PASSWORD}\
 		    -noprompt\
-		    -keystore /etc/pki/ca-trust/extracted/java/cacerts \
+		    -keystore /usr/local/openjdk-15/lib/security/cacerts \
 		    -file ${APPLIANCE_FOLDER}/build/cert/archiver-mgmt.crt
 
             xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" -v "https://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
