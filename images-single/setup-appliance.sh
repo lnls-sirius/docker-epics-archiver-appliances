@@ -3,7 +3,7 @@ set -a
 set -e
 set -x
 
-RAND_SRV_PORT=16000
+RAND_SRV_PORT=${BASE_TOMCAT_SERVER_PORT:=1600}
 
 [ -z "$MYSQL_SQL_ADDRESS" ] && MYSQL_SQL_ADDRESS=$(getent hosts epics-archiver-mysql-db | awk '{ print $1 }') && echo "Using default MYSQL_SQL_ADDRESS=${MYSQL_SQL_ADDRESS}"
 [ -z "$MYSQL_PORT" ] && MYSQL_PORT=3306 && echo "Using default MYSQL_PORT=${MYSQL_PORT}"
@@ -64,8 +64,9 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
 
     elif [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
 
-        # Sets cluster inet port
-        xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" -v "${IP_ADDRESS}:12000" ${ARCHAPPL_APPLIANCES}
+        # Sets cluster inet port and host
+        CLUSTER_INET_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" /opt/epics-archiver-appliances/configuration/lnls_appliances.xml | awk -F ':' '{print $2'})
+        xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" -v "${IP_ADDRESS}:${CLUSTER_INET_PORT}" ${ARCHAPPL_APPLIANCES}
 
         if [ "${USE_AUTHENTICATION}" = true ]; then
 

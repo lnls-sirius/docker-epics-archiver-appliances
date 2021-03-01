@@ -45,6 +45,7 @@ This image requires the following parameters when it is executed:
 8) `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` and `MYSQL_PORT` set the MySQL database connection.
 9) `JAVA_OPTS` should be used when eventual JVM parameters need to be used.
 10) `APPLIANCE_BASE_MX_PORT` base JMX port used when launching each appliance. For each appliance the port will increase by one.
+11) `BASE_TOMCAT_SERVER_PORT` tomcart starting port used on each appliance. Defaults to 1600, increase +1 per appliance.
 
 ## Running
 
