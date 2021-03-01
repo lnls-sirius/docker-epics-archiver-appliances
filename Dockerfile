@@ -1,7 +1,5 @@
-# Docker image for a general EPICS Archiver Appliance.
-# It consists of the base image for the mgmt, etl, engine and retrieval Docker containers.
-
-FROM tomcat:9-jdk8-corretto
+ARG TOMCAT_BASE_IMAGE
+FROM ${TOMCAT_BASE_IMAGE}
 
 # User root is required to install all needed packages
 USER root
@@ -11,24 +9,23 @@ ENV TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Updates default image and install required packages
-RUN amazon-linux-extras enable epel && yum clean metadata && yum install -y epel-release &&\
-    yum install -y \
-     ant \
-     gcc \
-     gcc-c++ \
-     git \
-     hostname \
-     libreadline-dev \
-     make \
-     make\
-     perl \
-     tar \
-     tzdata \
-     tzdata-java \
-     wget \
-     xmlstarlet \
-     &&\
-     rm -rf /var/lib/apt/lists/*
+RUN set -x;\
+    apt update -y; \
+    apt install -y \
+       ant \
+       g++ \
+       gcc \
+       git \
+       hostname \
+       libreadline-dev \
+       make \
+       perl \
+       tar \
+       tzdata \
+       wget \
+       xmlstarlet \
+       ;\
+    rm -rf /var/lib/apt/lists/*
 
 ENV APPLIANCE_NAME epics-archiver-appliances
 ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
@@ -70,8 +67,9 @@ RUN wget -P ${APPLIANCE_FOLDER}/build/bin https://dev.mysql.com/get/Downloads/Co
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/configuration
 RUN mkdir -p ${APPLIANCE_FOLDER}/storage
-# ARCHAPPL_APPLIANCES is always the same for every image, but ARCHAPPL_MYIDENTITY is not. So it needs to be
-# defined when the container is started
+
+# ARCHAPPL_APPLIANCES is always the same for every image, but ARCHAPPL_MYIDENTITY is not.
+# So it needs to be defined when the container is started
 ENV ARCHAPPL_APPLIANCES ${APPLIANCE_FOLDER}/configuration/lnls_appliances.xml
 ENV ARCHAPPL_POLICIES ${APPLIANCE_FOLDER}/configuration/lnls_policies.py
 ENV ARCHAPPL_SHORT_TERM_FOLDER ${APPLIANCE_FOLDER}/storage/sts
