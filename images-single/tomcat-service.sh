@@ -14,11 +14,19 @@ ${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
 
 export JMX_PORT=${APPLIANCE_BASE_JMX_PORT}
 for APPLIANCE_UNIT in "engine" "retrieval" "etl" "mgmt"; do
+    OPTS=""
+    OPTS="${OPTS} -Dlog4j.debug"
+    OPTS="${OPTS} -Dcom.sun.management.jmxremote"
+    OPTS="${OPTS} -Dcom.sun.management.jmxremote.port=${JMX_PORT}"
+    OPTS="${OPTS} -Dcom.sun.management.jmxremote.ssl=false"
+    OPTS="${OPTS} -Dcom.sun.management.jmxremote.authenticate=false"
+
     echo "Appliance ${APPLIANCE_UNIT}, JMX_PORT=${JMX_PORT}"
     export CATALINA_BASE=${CATALINA_HOME}/${APPLIANCE_UNIT}
-    export CATALINA_OPTS="${JAVA_OPTS} -Dlog4j.debug -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=${JMX_PORT} -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
-    JMX_PORT=$((JMX_PORT + 1))
+    export CATALINA_OPTS="${JAVA_OPTS} ${OPTS}"
     ${CATALINA_HOME}/bin/catalina.sh start
+
+    JMX_PORT=$((JMX_PORT + 1))
 done
 
 tail -f /dev/null
