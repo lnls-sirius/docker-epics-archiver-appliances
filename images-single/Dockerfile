@@ -27,4 +27,6 @@ COPY configuration/context.xml ${CATALINA_HOME}/conf/context.xml
 
 RUN mkdir ${APPLIANCE_FOLDER}/build/cert/
 
+ENV APPLIANCE_CERTS_FOLDER ${APPLIANCE_FOLDER}/certs
+
 CMD ["sh", "-c", "${APPLIANCE_FOLDER}/build/scripts/tomcat-service.sh"]
