@@ -57,7 +57,7 @@ function setup_ssl_certs {
         -dname "CN=${IP_ADDRESS}, OU=GAS, O=CNPEM, L=Campinas, ST=SP, C=BR"\
         -storepass ${CERTIFICATE_PASSWORD}\
         -keypass ${CERTIFICATE_PASSWORD}\
-        -keystore ${APPLIANCE_CERTS_FOLDER}/${ARCHAPPL_MYIDENTITY}appliance-${APPLIANCE_UNIT}.keystore\
+        -keystore ${APPLIANCE_CERTS_FOLDER}/${ARCHAPPL_MYIDENTITY}-${APPLIANCE_UNIT}.keystore\
         -validity 3650
     fi
 
