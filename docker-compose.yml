@@ -5,14 +5,15 @@ services:
 #   command: sleep infinity
 
   single_1:
-    hostname: epics-archiver
-    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-2021-03-01
+    hostname: epics-archiver-1
+    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-2021-03-02
     environment:
       GITHUB_APPLIANCES_BRANCH: "PR-JDK12-master"
       ARCHAPPL_MYIDENTITY: "lnls_control_appliance_1"
-      USE_AUTHENTICATION: "true"
+      APPLIANCE_BASE_JMX_PORT: "9050"
+      BASE_TOMCAT_SERVER_PORT: "1600"
     ports:
-      - 11000:11000
+#     - 11000:11000
       - 11995:11995
       - 11996:11996
       - 11997:11997
@@ -22,18 +23,31 @@ services:
       - ./.ldap.env
       - ./.archiver.env
     volumes:
+      - ./images-single/certificate/:/opt/epics-archiver-appliances/certs
       - ./images-single/configuration/lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
       - ./images-single/configuration/lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
+      # Logging
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/engine-log4j.properties
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/mgmt-log4j.properties
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/etl-log4j.properties
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/retrieval-log4j.properties
+    depends_on:
+      - epics-archiver-mysql-db
+#   extra_hosts:
+#     - "epics-archiver-1:0.0.0.0"
+#     - "epics-archiver-2:0.0.0.0"
+#     - "epics-archiver-mysql-db:0.0.0.0"
 
   single_2:
-    hostname: epics-archiver
-    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-2021-03-01
+    hostname: epics-archiver-2
+    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-2021-03-02
     environment:
       GITHUB_APPLIANCES_BRANCH: "PR-JDK12-master"
       ARCHAPPL_MYIDENTITY: "lnls_control_appliance_2"
-      USE_AUTHENTICATION: "true"
+      APPLIANCE_BASE_JMX_PORT: "9055"
+      BASE_TOMCAT_SERVER_PORT: "1605"
     ports:
-      - 12000:12000
+#     - 12000:12000
       - 12995:12995
       - 12996:12996
       - 12997:12997
@@ -43,8 +57,20 @@ services:
       - ./.ldap.env
       - ./.archiver.env
     volumes:
+     #- ./images-single/certificate/:/opt/epics-archiver-appliances/certs
       - ./images-single/configuration/lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
       - ./images-single/configuration/lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
+      # Logging
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/engine-log4j.properties
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/mgmt-log4j.properties
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/etl-log4j.properties
+      - ./log4j.properties:/opt/epics-archiver-appliances/configuration/retrieval-log4j.properties
+    depends_on:
+      - epics-archiver-mysql-db
+#   extra_hosts:
+#     - "epics-archiver-2:0.0.0.0"
+#     - "epics-archiver-1:0.0.0.0"
+#     - "epics-archiver-mysql-db:0.0.0.0"
 
   epics-archiver-mysql-db:
     hostname: epics-archiver-mysql-db
@@ -53,4 +79,4 @@ services:
       - ./.sql.env
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./db:/var/lib/mysql:rw
+     #- ./db_1:/var/lib/mysql:rw
