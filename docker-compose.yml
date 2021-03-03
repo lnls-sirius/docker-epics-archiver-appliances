@@ -13,7 +13,7 @@ services:
       APPLIANCE_BASE_JMX_PORT: "9050"
       BASE_TOMCAT_SERVER_PORT: "1600"
     ports:
-#     - 11000:11000
+      - 11000:11000
       - 11995:11995
       - 11996:11996
       - 11997:11997
@@ -47,7 +47,7 @@ services:
       APPLIANCE_BASE_JMX_PORT: "9055"
       BASE_TOMCAT_SERVER_PORT: "1605"
     ports:
-#     - 12000:12000
+      - 12000:12000
       - 12995:12995
       - 12996:12996
       - 12997:12997
@@ -57,7 +57,7 @@ services:
       - ./.ldap.env
       - ./.archiver.env
     volumes:
-     #- ./images-single/certificate/:/opt/epics-archiver-appliances/certs
+      - ./images-single/certificate/:/opt/epics-archiver-appliances/certs
       - ./images-single/configuration/lnls_appliances.xml:/opt/epics-archiver-appliances/configuration/lnls_appliances.xml:rw
       - ./images-single/configuration/lnls_policies.py:/opt/epics-archiver-appliances/configuration/lnls_policies.py:ro
       # Logging

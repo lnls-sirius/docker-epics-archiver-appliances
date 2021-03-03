@@ -2,8 +2,8 @@
 <appliances>
   <appliance>
     <identity>lnls_control_appliance_1</identity>
-    <cluster_inetport>epics-archiver-1:12000</cluster_inetport>
-    <mgmt_url>http://epics-archiver-1:11995/mgmt/bpl</mgmt_url>
+    <cluster_inetport>epics-archiver-1:11000</cluster_inetport>
+    <mgmt_url>https://epics-archiver-1:11995/mgmt/bpl</mgmt_url>
     <engine_url>http://epics-archiver-1:11996/engine/bpl</engine_url>
     <etl_url>http://epics-archiver-1:11997/etl/bpl</etl_url>
     <retrieval_url>http://epics-archiver-1:11998/retrieval/bpl</retrieval_url>
@@ -12,7 +12,7 @@
   <appliance>
     <identity>lnls_control_appliance_2</identity>
     <cluster_inetport>epics-archiver-2:12000</cluster_inetport>
-    <mgmt_url>http://epics-archiver-2:12995/mgmt/bpl</mgmt_url>
+    <mgmt_url>https://epics-archiver-2:12995/mgmt/bpl</mgmt_url>
     <engine_url>http://epics-archiver-2:12996/engine/bpl</engine_url>
     <etl_url>http://epics-archiver-2:12997/etl/bpl</etl_url>
     <retrieval_url>http://epics-archiver-2:12998/retrieval/bpl</retrieval_url>
