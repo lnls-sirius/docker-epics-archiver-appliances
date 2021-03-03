@@ -19,7 +19,7 @@ LABELS += --label "br.com.lnls-sirius.maintener=Claudio Ferreira Carneiro"
 LABELS += --label "br.com.lnls-sirius.repo=https://github.com/lnls-sirius/docker-epics-archiver-appliances"
 
 EPICS_ARCHVIER_BASE_IMG = $(DOCKER_IMAGE_PREFIX)/epics-archiver-base
-EPICS_ARCHVIER_BASE_TAG = tomcat9-jdk15-epics${EPICS_VERSION}-$(GITHUB_REPOSITORY_BRANCH)-$(DATE)
+EPICS_ARCHVIER_BASE_TAG = tomcat9-jdk15-epics$(EPICS_VERSION)-$(GITHUB_REPOSITORY_BRANCH)-$(DATE)
 
 EPICS_ARCHVIER_SINGLE_IMG = $(DOCKER_IMAGE_PREFIX)/epics-archiver-single
 EPICS_ARCHVIER_SINGLE_TAG = $(EPICS_ARCHVIER_BASE_TAG)
