@@ -96,7 +96,9 @@ function setup_ssl_certs {
         -i "/Server/Service/Connector" -t attr -n "secure" -v "true" \
         ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
-    xmlstarlet ed -L -s '/Server/Service/Connector[@port='"${APPLIANCE_PORT}"']' -t elem -n "SSLHostConfig" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+    xmlstarlet ed -L \
+        -s '/Server/Service/Connector[@port='"${APPLIANCE_PORT}"']' \
+        -t elem -n "SSLHostConfig" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
     cp --verbose ${APPLIANCE_CERTS_FOLDER}/${ARCHAPPL_MYIDENTITY}-${APPLIANCE_UNIT}.keystore ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf
 
@@ -130,19 +132,27 @@ function setup_ldap_realm {
     fi
 
     if [ ! -z ${CONNECTION_ROLE_NAME+x} ]; then
-        xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "roleName" -v "${CONNECTION_ROLE_NAME}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+        xmlstarlet ed -L\
+            -i '/Server/Service/Engine/Host/Realm' \
+            -t attr -n "roleName" -v "${CONNECTION_ROLE_NAME}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
     fi
 
     if [ ! -z ${CONNECTION_ROLE_SEARCH+x} ]; then
-        xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "roleSearch" -v "${CONNECTION_ROLE_SEARCH}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+        xmlstarlet ed -L\
+            -i '/Server/Service/Engine/Host/Realm'\
+            -t attr -n "roleSearch" -v "${CONNECTION_ROLE_SEARCH}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
     fi
 
     if [ ! -z ${CONNECTION_NAME+x} ]; then
-        xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionName" -v "${CONNECTION_NAME}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+        xmlstarlet ed -L\
+            -i '/Server/Service/Engine/Host/Realm' \
+            -t attr -n "connectionName" -v "${CONNECTION_NAME}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
     fi
 
     if [ ! -z ${CONNECTION_PASSWORD+x} ]; then
-        xmlstarlet ed -L -i '/Server/Service/Engine/Host/Realm' -t attr -n "connectionPassword" -v "${CONNECTION_PASSWORD}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+        xmlstarlet ed -L\
+            -i '/Server/Service/Engine/Host/Realm'\
+            -t attr -n "connectionPassword" -v "${CONNECTION_PASSWORD}" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
     fi
 }
 
@@ -223,35 +233,49 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
 
     if [ "${APPLIANCE_UNIT}" = "engine" ] || [ "${APPLIANCE_UNIT}" = "etl" ] || [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
 
-        xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
+        xmlstarlet ed -L\
+            -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url"\
+            -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
 
         if [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
-            xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/data_retrieval_url" -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}" ${ARCHAPPL_APPLIANCES}
+            xmlstarlet ed -L\
+                -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/data_retrieval_url"\
+                -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}" ${ARCHAPPL_APPLIANCES}
         fi
 
         # Appends new connector
-        xmlstarlet ed -L -u "/Server/Service/Connector[@protocol='HTTP/1.1']/@port" -v ${APPLIANCE_PORT} ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+        xmlstarlet ed -L\
+            -u "/Server/Service/Connector[@protocol='HTTP/1.1']/@port"\
+            -v ${APPLIANCE_PORT} ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
         # Remove every other connector entry from the conf/server.xml
-        xmlstarlet ed -L -d "/Server/Service/Connector[@protocol!='HTTP/1.1']" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+        xmlstarlet ed -L\
+            -d "/Server/Service/Connector[@protocol!='HTTP/1.1']" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
     elif [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
 
         # Sets cluster inet port and host
         CLUSTER_INET_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" /opt/epics-archiver-appliances/configuration/lnls_appliances.xml | awk -F ':' '{print $2'})
-        xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" -v "${IP_ADDRESS}:${CLUSTER_INET_PORT}" ${ARCHAPPL_APPLIANCES}
+        xmlstarlet ed -L\
+            -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport"\
+            -v "${IP_ADDRESS}:${CLUSTER_INET_PORT}" ${ARCHAPPL_APPLIANCES}
 
         if [ "${USE_SSL}" = true ]; then
             setup_ssl_certs
         else
             # Force HTTP
-            xmlstarlet ed -L -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
+            xmlstarlet ed -L\
+                -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url"\
+                -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
 
             # Appends new connector
-            xmlstarlet ed -L -u "/Server/Service/Connector[@protocol='HTTP/1.1']/@port" -v ${APPLIANCE_PORT} ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+            xmlstarlet ed -L\
+                -u "/Server/Service/Connector[@protocol='HTTP/1.1']/@port"\
+                -v ${APPLIANCE_PORT} ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
             # Remove every other connector entry from the conf/server.xml
-            xmlstarlet ed -L -d "/Server/Service/Connector[@protocol!='HTTP/1.1']" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
+            xmlstarlet ed -L\
+                -d "/Server/Service/Connector[@protocol!='HTTP/1.1']" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
         fi
 
         if [ "${USE_AUTHENTICATION}" = true ]; then
