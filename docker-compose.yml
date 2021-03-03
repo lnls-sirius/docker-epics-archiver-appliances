@@ -6,9 +6,8 @@ services:
 
   single_1:
     hostname: epics-archiver-1
-    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-2021-03-02
+    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-PR-JDK12-master-2021-03-02
     environment:
-      GITHUB_APPLIANCES_BRANCH: "PR-JDK12-master"
       ARCHAPPL_MYIDENTITY: "lnls_control_appliance_1"
       APPLIANCE_BASE_JMX_PORT: "9050"
       BASE_TOMCAT_SERVER_PORT: "1600"
@@ -40,9 +39,8 @@ services:
 
   single_2:
     hostname: epics-archiver-2
-    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-2021-03-02
+    image: lnlscon/epics-archiver-single:tomcat9-jdk15-epicsR7.0.5-PR-JDK12-master-2021-03-02
     environment:
-      GITHUB_APPLIANCES_BRANCH: "PR-JDK12-master"
       ARCHAPPL_MYIDENTITY: "lnls_control_appliance_2"
       APPLIANCE_BASE_JMX_PORT: "9055"
       BASE_TOMCAT_SERVER_PORT: "1605"

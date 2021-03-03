@@ -56,11 +56,18 @@ RUN set -e; set -x;\
 
 # Github repository variables
 ENV GITHUB_REPOSITORY_FOLDER /opt/epicsarchiverap-ldap
-ENV GITHUB_REPOSITORY_URL https://github.com/lnls-sirius/epicsarchiverap-ldap.git
+ARG GITHUB_REPOSITORY_URL
+ARG GITHUB_REPOSITORY_BRANCH
+ARG GITHUB_REPOSITORY_COMMIT
 
 # Clone archiver github's repository
-RUN git clone ${GITHUB_REPOSITORY_URL} ${GITHUB_REPOSITORY_FOLDER} && \
-     mkdir -p ${APPLIANCE_FOLDER}/build/bin
+RUN set -x;\
+    set -e;\
+    git clone ${GITHUB_REPOSITORY_URL} ${GITHUB_REPOSITORY_FOLDER};\
+    mkdir -p ${APPLIANCE_FOLDER}/build/bin;\
+    cd ${GITHUB_REPOSITORY_FOLDER};\
+    git checkout ${GITHUB_REPOSITORY_BRANCH};\
+    if [ ! -z "${GITHUB_REPOSITORY_COMMIT}" ]; then git checkout ${GITHUB_REPOSITORY_COMMIT}; fi
 
 ### Set up mysql connector
 ENV MYSQL_CONNECTOR mysql-connector-java-8.0.22

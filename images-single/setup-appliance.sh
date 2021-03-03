@@ -3,22 +3,6 @@ set -a
 set -e
 set -x
 
-function checkout_archiver_branch {
-    if [ "${USE_AUTHENTICATION}" = true ]; then
-        GITHUB_APPLIANCES_BRANCH=${GITHUB_APPLIANCES_BRANCH:-ldap-login}
-    else
-        GITHUB_APPLIANCES_BRANCH=${GITHUB_APPLIANCES_BRANCH:-master}
-    fi
-
-    (
-        cd ${GITHUB_REPOSITORY_FOLDER}
-        git config user.email "controle@lnls.br"
-        git config user.name "Controls Group"
-        git fetch origin ${GITHUB_APPLIANCES_BRANCH}
-        git checkout ${GITHUB_APPLIANCES_BRANCH}
-    )
-}
-
 function setup_mysql_connection {
 
     if [ -z "$MYSQL_SQL_ADDRESS" ]; then
@@ -52,7 +36,7 @@ function setup_ssl_certs {
         # Generates keystore
         keytool\
         -genkey\
-        -alias tomcat\
+        -alias ${ARCHAPPL_MYIDENTITY}-${APPLIANCE_UNIT}\
         -keyalg RSA\
         -dname "CN=${IP_ADDRESS}, OU=GAS, O=CNPEM, L=Campinas, ST=SP, C=BR"\
         -storepass ${CERTIFICATE_PASSWORD}\
@@ -66,7 +50,7 @@ function setup_ssl_certs {
         keytool\
         -exportcert\
         -keystore ${APPLIANCE_CERTS_FOLDER}/${ARCHAPPL_MYIDENTITY}-${APPLIANCE_UNIT}.keystore\
-        -alias tomcat\
+        -alias ${ARCHAPPL_MYIDENTITY}-${APPLIANCE_UNIT}\
         -storepass ${CERTIFICATE_PASSWORD}\
         -file ${APPLIANCE_CERTS_FOLDER}/${ARCHAPPL_MYIDENTITY}-${APPLIANCE_UNIT}.crt
     fi
@@ -82,7 +66,7 @@ function setup_ssl_certs {
 
         keytool \
             -import\
-            -alias tomcat\
+            -alias ${IDENTITY}-${APPLIANCE_UNIT}\
             -trustcacerts\
             -storepass ${CERTIFICATE_PASSWORD}\
             -noprompt\
@@ -222,9 +206,6 @@ IP_ADDRESS=$(hostname)
 
 setup_mysql_connection
 
-checkout_archiver_branch
-
-
 for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
 
     APPLIANCE_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//")
@@ -281,7 +262,5 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
 
     RAND_SRV_PORT=$((RAND_SRV_PORT + 1))
 done
-
-build_appliances
 
 update_appliance_config
