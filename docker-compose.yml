@@ -79,4 +79,4 @@ services:
       - ./.sql.env
     volumes:
       - /etc/localtime:/etc/localtime:ro
-     #- ./db_1:/var/lib/mysql:rw
+      - ./db:/var/lib/mysql:rw
