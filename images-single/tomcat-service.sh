@@ -22,11 +22,13 @@ for APPLIANCE_UNIT in "engine" "retrieval" "etl" "mgmt"; do
     OPTS="${OPTS} -Dcom.sun.management.jmxremote.ssl=false"
     OPTS="${OPTS} -Dcom.sun.management.jmxremote.authenticate=false"
 
+    set +u
     # Appliance specific OPTS
     [[ "${APPLIANCE_UNIT}" = "engine" ]]    && OPTS="${OPTS} ${JAVA_OPTS_ENGINE}"
     [[ "${APPLIANCE_UNIT}" = "retrieval" ]] && OPTS="${OPTS} ${JAVA_OPTS_RETRIEVAL}"
     [[ "${APPLIANCE_UNIT}" = "etl" ]]       && OPTS="${OPTS} ${JAVA_OPTS_ETL}"
     [[ "${APPLIANCE_UNIT}" = "mgmt" ]]      && OPTS="${OPTS} ${JAVA_OPTS_MGMT}"
+    set -u
 
     echo "Appliance ${APPLIANCE_UNIT}, JMX_PORT=${JMX_PORT}"
     export CATALINA_BASE=${CATALINA_HOME}/${APPLIANCE_UNIT}
