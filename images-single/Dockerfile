@@ -18,17 +18,17 @@ ENV BASE_TOMCAT_SERVER_PORT 16000
 ENV APPLIANCE_FOLDER /opt/${APPLIANCE_NAME}
 
 RUN mkdir -p ${APPLIANCE_FOLDER}/all
-COPY build-appliance.sh \
-     setup-appliance.sh \
-     tomcat-service.sh \
+COPY build-appliance.bash \
+     setup-appliance.bash \
+     tomcat-service.bash \
      ${APPLIANCE_FOLDER}/build/scripts/
 
 COPY configuration/context.xml ${CATALINA_HOME}/conf/context.xml
 
 RUN mkdir ${APPLIANCE_FOLDER}/build/cert/
 
-RUN ${APPLIANCE_FOLDER}/build/scripts/build-appliance.sh
+RUN ${APPLIANCE_FOLDER}/build/scripts/build-appliance.bash
 
 ENV APPLIANCE_CERTS_FOLDER ${APPLIANCE_FOLDER}/certs
 
-CMD ["sh", "-c", "${APPLIANCE_FOLDER}/build/scripts/tomcat-service.sh"]
+CMD ["bash", "-c", "${APPLIANCE_FOLDER}/build/scripts/tomcat-service.bash"]

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # A simple script to start tomcat service. This script blocks and does not
 # allow the container to finish and end.
 set -a
@@ -10,7 +10,7 @@ chmod +x ${APPLIANCE_FOLDER}/build/configuration/wait-for-it/wait-for-it.sh
 ${APPLIANCE_FOLDER}/build/configuration/wait-for-it/wait-for-it.sh epics-archiver-mysql-db:3306
 
 # Setup all appliances
-${APPLIANCE_FOLDER}/build/scripts/setup-appliance.sh
+${APPLIANCE_FOLDER}/build/scripts/setup-appliance.bash
 
 export JMX_PORT=${APPLIANCE_BASE_JMX_PORT}
 for APPLIANCE_UNIT in "engine" "retrieval" "etl" "mgmt"; do
