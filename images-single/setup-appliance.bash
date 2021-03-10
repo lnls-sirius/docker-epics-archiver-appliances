@@ -4,7 +4,6 @@ set -e
 set -x
 
 function setup_mysql_connection {
-
     if [ -z "$MYSQL_SQL_ADDRESS" ]; then
         MYSQL_SQL_ADDRESS=$(getent hosts epics-archiver-mysql-db | awk '{ print $1 }')
         echo "Using default MYSQL_SQL_ADDRESS=${MYSQL_SQL_ADDRESS}"
@@ -61,7 +60,7 @@ function setup_ssl_certs {
         CRT_FILE=${APPLIANCE_CERTS_FOLDER}/${IDENTITY}-${APPLIANCE_UNIT}.crt
         while [ ! -f ${CRT_FILE} ]; do
             echo "CRT ${CRT_FILE} does not exists"
-            sleep 2 # or less like 0.2
+            sleep 2
         done
 
         keytool \
@@ -76,11 +75,6 @@ function setup_ssl_certs {
 
     # Copies keystore to conf/
     cp --verbose ${APPLIANCE_CERTS_FOLDER}/${ARCHAPPL_MYIDENTITY}-${APPLIANCE_UNIT}.keystore ${CATALINA_HOME}/conf/
-
-    # Force HTTPS
-    xmlstarlet ed -L \
-        -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url"\
-        -v "https://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
 
     # Remove default connector port
     xmlstarlet ed -L -d "/Server/Service/Connector" ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
@@ -182,43 +176,11 @@ function build_appliances {
     done
 }
 
-function update_appliance_config {
+function create_appliance_dir_structure {
+    set +x
+    echo "Creating ${APPLIANCE_UNIT} dir structure"
+    echo ""
     set -x
-    for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
-
-        # Overwrite log4j settings if possible
-        if [ -f "${APPLIANCE_FOLDER}/configuration/${APPLIANCE_UNIT}-log4j.properties" ]; then
-            cp \
-                --verbose\
-                --force\
-                "${APPLIANCE_FOLDER}/configuration/${APPLIANCE_UNIT}-log4j.properties"\
-                ${CATALINA_HOME}/${APPLIANCE_UNIT}/webapps/${APPLIANCE_UNIT}/WEB-INF/classes/log4j.properties
-        fi
-
-        # Do not allow external accesses in engine and etl appliances
-        if [ "${APPLIANCE_UNIT}" = "engine" ] || [ "${APPLIANCE_UNIT}" = "etl" ]; then
-            echo "Applying access restriction from external networks..."
-            # Find a way to change allowed addresses with the internal network address
-            # xmlstarlet ed -L -s '/Context' -t elem -n 'Valve' \
-            #		  -i '/Context/Valve' -t attr -n 'className' -v 'org.apache.catalina.valves.RemoteAddrValve' \
-            #                 -i '/Context/Valve' -t attr -n 'allow' -v '172\.17\.\d+\.\d+' \
-            #                 ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/context.xml
-        fi
-    done
-    set -x
-}
-
-RAND_SRV_PORT=${BASE_TOMCAT_SERVER_PORT:=1600}
-
-# Before starting Tomcat service, change all addresses in lnls_appliances.xml.
-# Get local ip address
-IP_ADDRESS=$(hostname)
-
-setup_mysql_connection
-
-for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
-
-    APPLIANCE_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//")
 
     mkdir --verbose --parents ${CATALINA_HOME}/${APPLIANCE_UNIT}
     cp --verbose --recursive ${CATALINA_HOME}/conf ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf
@@ -227,22 +189,55 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
     mkdir --verbose --parents ${CATALINA_HOME}/${APPLIANCE_UNIT}/logs
     mkdir --verbose --parents ${CATALINA_HOME}/${APPLIANCE_UNIT}/temp
     mkdir --verbose --parents ${CATALINA_HOME}/${APPLIANCE_UNIT}/work
+}
 
+function update_appliance_log_settings {
+    set +x
+    echo "Update ${APPLIANCE_UNIT} log settings"
+    set -x
+
+    # Overwrite log4j settings if possible
+    if [ -f "${APPLIANCE_FOLDER}/configuration/${APPLIANCE_UNIT}-log4j.properties" ]; then
+        cp \
+            --verbose\
+            --force\
+            "${APPLIANCE_FOLDER}/configuration/${APPLIANCE_UNIT}-log4j.properties"\
+            ${CATALINA_HOME}/${APPLIANCE_UNIT}/webapps/${APPLIANCE_UNIT}/WEB-INF/classes/log4j.properties
+    fi
+}
+
+function update_appliance_url {
+    # Force https in case of USE_SSL and MGMT unit
+    [[ "${APPLIANCE_UNIT}" = "mgmt" ]] && [[ "${USE_SSL}" = true ]] && \
+        UNIT_URL="https://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}" ||\
+        UNIT_URL="http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}"
+
+    xmlstarlet ed -L\
+        -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url"\
+        -v "${UNIT_URL}/bpl" ${ARCHAPPL_APPLIANCES}
+
+    if [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
+        xmlstarlet ed -L\
+            -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/data_retrieval_url"\
+            -v "${UNIT_URL}" ${ARCHAPPL_APPLIANCES}
+    fi
+}
+
+function update_appliance_cluster_inet {
+    CLUSTER_INET_PORT=$(xmlstarlet sel -t \
+            -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport"\
+            /opt/epics-archiver-appliances/configuration/lnls_appliances.xml | awk -F ':' '{print $2'})
+    [[ -z "${CLUSTER_INET_PORT}" ]] && echo "Could not select appliance cluster inet port" && exit -1
+    xmlstarlet ed -L\
+        -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport"\
+        -v "${IP_ADDRESS}:${CLUSTER_INET_PORT}" ${ARCHAPPL_APPLIANCES}
+}
+
+function update_appliance_tomcat {
     # Unit's tomcat server port
     xmlstarlet ed -L -u '/Server/@port' -v ${RAND_SRV_PORT} ${CATALINA_HOME}/${APPLIANCE_UNIT}/conf/server.xml
 
     if [ "${APPLIANCE_UNIT}" = "engine" ] || [ "${APPLIANCE_UNIT}" = "etl" ] || [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
-
-        xmlstarlet ed -L\
-            -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url"\
-            -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
-
-        if [ "${APPLIANCE_UNIT}" = "retrieval" ]; then
-            xmlstarlet ed -L\
-                -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/data_retrieval_url"\
-                -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}" ${ARCHAPPL_APPLIANCES}
-        fi
-
         # Appends new connector
         xmlstarlet ed -L\
             -u "/Server/Service/Connector[@protocol='HTTP/1.1']/@port"\
@@ -254,20 +249,9 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
 
     elif [ "${APPLIANCE_UNIT}" = "mgmt" ]; then
 
-        # Sets cluster inet port and host
-        CLUSTER_INET_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport" /opt/epics-archiver-appliances/configuration/lnls_appliances.xml | awk -F ':' '{print $2'})
-        xmlstarlet ed -L\
-            -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/cluster_inetport"\
-            -v "${IP_ADDRESS}:${CLUSTER_INET_PORT}" ${ARCHAPPL_APPLIANCES}
-
         if [ "${USE_SSL}" = true ]; then
             setup_ssl_certs
         else
-            # Force HTTP
-            xmlstarlet ed -L\
-                -u "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url"\
-                -v "http://${IP_ADDRESS}:${APPLIANCE_PORT}/${APPLIANCE_UNIT}/bpl" ${ARCHAPPL_APPLIANCES}
-
             # Appends new connector
             xmlstarlet ed -L\
                 -u "/Server/Service/Connector[@protocol='HTTP/1.1']/@port"\
@@ -281,10 +265,41 @@ for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
         if [ "${USE_AUTHENTICATION}" = true ]; then
             setup_ldap_realm
         fi
-
     fi
+}
 
-    RAND_SRV_PORT=$((RAND_SRV_PORT + 1))
-done
+function update_appliance_config {
+    set -x
+    # Base tomcat server port
+    RAND_SRV_PORT=${BASE_TOMCAT_SERVER_PORT:=1600}
+
+    # Sets cluster inet port and host
+    update_appliance_cluster_inet
+
+    for APPLIANCE_UNIT in "mgmt" "engine" "retrieval" "etl"; do
+
+        APPLIANCE_PORT=$(xmlstarlet sel -t -v "/appliances/appliance[identity='${ARCHAPPL_MYIDENTITY}']/${APPLIANCE_UNIT}_url" ${ARCHAPPL_APPLIANCES} | sed "s/.*://" | sed "s/\/.*//")
+        echo "${APPLIANCE_UNIT}: Port ${APPLIANCE_PORT}"
+
+        # Early stop if the appliance setting at ${ARCHAPPL_APPLIANCES} is invalid
+        [[ -z "${APPLIANCE_PORT}" ]] && echo "Could not select appliance port" && exit -1
+
+        create_appliance_dir_structure
+
+        update_appliance_log_settings
+
+        update_appliance_url
+
+        update_appliance_tomcat
+
+        RAND_SRV_PORT=$((RAND_SRV_PORT + 1))
+    done
+    set -x
+}
+
+# Before starting Tomcat service, change all addresses in lnls_appliances.xml.
+IP_ADDRESS=$(hostname)
+
+setup_mysql_connection
 
 update_appliance_config
