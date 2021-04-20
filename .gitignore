@@ -1,3 +1,4 @@
 .vscode/
 db/
 .ldap.env
+images-single/certificate
