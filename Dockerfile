@@ -10,7 +10,9 @@ ENV TZ=America/Sao_Paulo
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Updates default image and install required packages
-RUN set -x;\
+ARG APT_PROXY_SERVER=TA-TiRack-CO-FWSrv-1.abtlus.org.br:3142
+RUN set -x; \
+    echo "Acquire::http { Proxy \"http://${APT_PROXY_SERVER}\"; }" > /etc/apt/apt.conf.d/proxy ;\
     apt update -y; \
     apt install -y \
        ant \
@@ -21,10 +23,12 @@ RUN set -x;\
        libreadline-dev \
        make \
        perl \
+       supervisor \
        tar \
        tzdata \
        wget \
        xmlstarlet \
+       neovim \
        ;\
     rm -rf /var/lib/apt/lists/*
 
